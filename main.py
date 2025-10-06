@@ -1,5 +1,6 @@
 def hello():
-    print("Helo from feature/navbar!")
+    print("Hello fom feature/navbar!")
+ main
 
 hello()
 
