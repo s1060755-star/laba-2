@@ -8,13 +8,13 @@ def home():
     dishes = [
         {
             "name": "Міні Червоний Оксамит",
-            "image": "images/red_velvet_mini.jpg",
-            "description": "Ніжний десерт із вершковим кремом, натхненний класичним червоним велветом."
+            "image": "static/images/mini.jpg",
+            "description": "Ніжний десерт із кремом маскарпоне та нотками ванілі"
         },
         {
-            "name": "Капкейк Velvet Kiss",
-            "image": "images/banner1.jpg",
-            "description": "М’який капкейк із червоного тіста та легким крем-сиром."
+            "name": "Капучино",
+            "image": "static/images/kapych.jpg",
+            "description": "Ніжна кава з молочною піною"
         }
     ]
     return render_template('index.html', dishes=dishes)

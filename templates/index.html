@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Velvet Bite — Меню</title>
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
@@ -18,6 +18,7 @@
                 <li><a href="#home">Головна</a></li>
                 <li><a href="#menu">Меню</a></li>
                 <li><a href="#contact">Контакти</a></li>
+                <li><a href="templates/about.html">Про нас</a></li>
             </ul>
         </nav>
         <section id="home" class="hero">
@@ -27,7 +28,7 @@
         </section>
     </header>
 
-    <!-- 🔸 Секція меню -->
+    <!--  Секція меню -->
     <section id="menu" class="menu-section">
         <h2>Наше меню</h2>
         <div class="menu-grid">

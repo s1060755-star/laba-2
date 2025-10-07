@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Velvet Bite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>{{ name }}</h1>
+        <nav>
+            <a href="/">Меню</a>
+            <a href="/about">Про нас</a>
+        </nav>
+    </header>
+
+    <main class="dish-details">
+        {% if dish %}
+            <img src="{{ url_for('static', filename=dish.image) }}" alt="{{ name }}">
+            <p>{{ dish.text }}</p>
+        {% else %}
+            <p>Такої страви не знайдено 😢</p>
+        {% endif %}
+    </main>
+
+    <footer>
+        <a href="/">← Назад до меню</a>
+    </footer>
+</body>
+</html>
