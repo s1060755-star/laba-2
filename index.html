@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Bite — Меню</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 🔸 Навігація -->
+    <header>
+        <nav class="navbar">
+            <h1 class="logo"><span>Velvet</span> Bite</h1>
+            <ul class="nav-links">
+                <li><a href="#home">Головна</a></li>
+                <li><a href="#menu">Меню</a></li>
+                <li><a href="#contact">Контакти</a></li>
+            </ul>
+        </nav>
+        <section id="home" class="hero">
+            <h1>Ласкаво просимо до Velvet Bite</h1>
+            <p>Насолоджуйся ароматною кавою та свіжою випічкою щодня!</p>
+            <a href="#menu" class="btn">Переглянути меню</a>
+        </section>
+    </header>
+
+    <!-- 🔸 Секція меню -->
+    <section id="menu" class="menu-section">
+        <h2>Наше меню</h2>
+        <div class="menu-grid">
+            <div class="menu-item">
+                <img src="images/mini.jpg" alt="Міні Червоний Оксамит">
+                <h3>Спробуйте нашу фірмову страву:</h3>
+                <p class="special">Міні Червоний Оксамит</p>
+                <p class="description">Ніжний десерт із кремом маскарпоне та нотками ванілі</p>
+                <span>80 грн</span>
+            </div>
+            <div class="menu-item">
+                <img src="images/kapych.jpg" alt="Капучино">
+                <h3>Капучино</h3>
+                <p>Ніжна кава з молочною піною</p>
+                <span>65 грн</span>
+            </div>
+
+            <div class="menu-item">
+                <img src="images/cheesecake.jpg" alt="Чізкейк">
+                <h3>Чізкейк</h3>
+                <p>Класичний десерт з вершковим сиром</p>
+                <span>85 грн</span>
+            </div>
+
+            <div class="menu-item">
+                <img src="images/americano.jpg" alt="Американо">
+                <h3>Американо</h3>
+                <p>Справжня класика кавового смаку</p>
+                <span>55 грн</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 🔸 Контакти -->
+    <section id="contact" class="contact-section">
+        <h2 class="contact-text">Зв'яжіться з нами</h2>
+        <form class="contact-form">
+            <input type="text" placeholder="Ваше ім’я" required>
+            <input type="email" placeholder="Ваш email" required>
+            <textarea rows="4" placeholder="Ваше повідомлення"></textarea>
+            <button type="submit">Надіслати</button>
+        </form>
+    </section>
+
+    <!-- 🔸 Футер -->
+    <footer>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,227 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+}
+
+body {
+  background-color: #FFF5F2; /* Rose Cream */
+  color: #4B2E2B; /* Chocolate Brown */
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🔹 Навбар */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 60px;
+    background: #2C1B18;
+}
+
+.logo {
+  font-family: 'Beau Rivage', serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #ffcc80; /* золотий */
+  letter-spacing: 2px;
+}
+
+.logo span {
+  font-family: "Alegreya", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  color: #8B0000; /* червоний велвет */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+.nav-links a {
+    color: #ffcc80;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.nav-links a:hover {
+    color: #ffcc80;
+}
+
+/* 🔹 Герой-секція */
+.hero {
+    text-align: center;
+    padding: 80px 20px; /* більше простору для тексту */
+    background: url('images/banner3.jpg') no-repeat center center/cover;
+    height: 35vh; /* 70% висоти екрана — виглядає як великий банер */
+    color: #ffcc80;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* центрує текст по вертикалі */
+    align-items: center;     /* центрує по горизонталі */
+}
+
+.hero h1 {
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.hero p {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.btn {
+    display: inline-block;
+    background: #ffcc80;
+    color: #3e2723;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.btn:hover {
+    background: #ffe0b2;
+}
+
+/* 🔹 Меню */
+.menu-section {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.menu-section h2 {
+    margin-bottom: 40px;
+    font-size: 2em;
+    color: #4B2E2B;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 0 40px;
+}
+
+.menu-item {
+    background: #FFF5F2;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.3s;
+}
+
+.menu-item:hover {
+    transform: translateY(-5px);
+}
+
+.menu-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.menu-item h3 {
+    margin: 15px 0 5px;
+    color: #4B2E2B;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.menu-item p {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.menu-item span {
+    display: block;
+    color: #ffcc80;
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+/* 🔹 Контакти */
+.contact-section {
+    text-align: center;
+    background: #ae5c5c;
+    padding: 80px 20px;
+}
+
+.contact-text {
+    color: #ffcc80;
+    height: 50px;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.contact-form {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.contact-form input,
+.contact-form textarea {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.contact-form button {
+    background: #3e2723;
+    color: #ffcc80;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.contact-form button:hover {
+    background: #5d4037;
+}
+
+/* 🔹 Футер */
+footer {
+    background: #3e2723;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+}
