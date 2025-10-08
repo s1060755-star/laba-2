@@ -5,15 +5,22 @@
     font-family: "Montserrat", sans-serif;
 }
 
+html, body {
+    height: 100%;
+}
+
 body {
-  background-color: #FFF5F2; /* Rose Cream */
-  color: #4B2E2B; /* Chocolate Brown */
+  background-color: #FFF5F2; 
+  color: #4B2E2B; 
   font-family: 'Montserrat', sans-serif;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
 }
 
-/* 🔹 Навбар */
+/* Навбар */
 .navbar {
     display: flex;
     justify-content: space-between;
@@ -25,17 +32,17 @@ body {
 .logo {
   font-family: 'Beau Rivage', serif;
   font-weight: 400;
-  font-style: normal;
-  color: #ffcc80; /* золотий */
+  color: #ffcc80;
   letter-spacing: 2px;
+  font-size: 30px;
 }
 
 .logo span {
   font-family: "Alegreya", serif;
   font-optical-sizing: auto;
   font-weight: 400;
-  font-style: normal;
-  color: #8B0000; /* червоний велвет */
+  color: #8B0000; 
+  font-size: 30px;
 }
 
 .nav-links {
@@ -124,10 +131,23 @@ body {
 
 .menu-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     padding: 0 40px;
 }
+
+@media (max-width: 900px) {
+    .menu-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .menu-grid {
+        grid-template-columns: 1fr; 
+    }
+}
+
 
 .menu-item {
     background: #FFF5F2;
@@ -173,7 +193,7 @@ body {
     font-style: normal;
 }
 
-/* 🔹 Контакти */
+/* Контакти */
 .contact-section {
     text-align: center;
     background: #ae5c5c;
@@ -218,10 +238,103 @@ body {
     background: #5d4037;
 }
 
-/* 🔹 Футер */
+/* Футер */
 footer {
     background: #3e2723;
     color: #fff;
     text-align: center;
-    padding: 20px;
+    padding: 15px 0;
+}
+
+.werh-btn{
+    margin-left: 80px;
+    display: inline-block;
+    background: #ffcc80;
+    color: #3e2723;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.werh h1 {
+    font-size: 38px;
+    color: #4B2E2B;
+    text-align: center;
+}
+
+.dish-detail {
+    display: flex;
+    align-items: flex-start; 
+    gap: 30px;               
+    margin-top: 20px;
+}
+
+.dish-detail img {
+    width: 35%;
+    height: 500px;
+    object-fit: cover;
+    margin-left: 80px;
+    border-radius: 25px;
+}
+
+.dish-info {
+    max-width: 500px; 
+}
+
+.dish-info h1 {
+    margin-top: 0;
+}
+
+.dish-info ul {
+    list-style: disc;
+    padding-left: 20px;
+}
+
+@media (max-width: 768px) {
+    .dish-detail {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .dish-info {
+        max-width: 100%;
+    }
+}
+
+.about-text {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+    text-align: center;
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-top: 50px;
+    font-size: 35px;
+}
+
+main, .menu-section, .contact-section, .dish-detail {
+    flex: 1;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:hover {
+  color: #ae5c5c; 
+}
+
+a:focus,
+a:active {
+  outline: none;
+  box-shadow: none;
 }

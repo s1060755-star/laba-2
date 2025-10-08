@@ -4,24 +4,39 @@
     <meta charset="UTF-8">
     <title>Про нас — Velvet Bite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
 </head>
 <body>
     <header>
-        <h1>Про нас</h1>
-        <nav>
-            <a href="/">Меню</a>
-            <a href="/about">Про нас</a>
+         <nav class="navbar">
+            <h1 class="logo"><span>Velvet</span> Bite</h1>
+            <ul class="nav-links">
+                <li><a href="/#home">Головна</a></li>
+                <li><a href="/#menu">Меню</a></li>
+                <li><a href="/#contact">Контакти</a></li>
+                <li><a href="/about">Про нас</a></li>
+            </ul>
         </nav>
     </header>
 
     <main>
-        <p>Ми — кав’ярня <b>Velvet Bite</b>, де кожен десерт створюється з любов’ю.  
+        <section class="hero">
+            <h1>Про нас</h1>
+            <p>Velvet Bite</p>
+            <a href="/#contact" class="btn">Наші контакти</a>
+        </section>
+        <p class="about-text">Ми — кав’ярня <b>Velvet Bite</b>, де кожен десерт створюється з любов’ю.  
         Наші шефи готують із натуральних інгредієнтів, а головна фішка — фірмові десерти з червоного оксамиту.</p>
     </main>
 
     <footer>
-        <a href="/">← Назад до меню</a>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
     </footer>
+
+    <script src="static/script.js"></script>
 </body>
 </html>
 

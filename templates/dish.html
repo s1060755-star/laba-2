@@ -2,29 +2,57 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Velvet Bite</title>
+    <title>{{ dish.name }} | Velvet Bite</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
 </head>
+</head>
+
 <body>
+    <!-- Навігація -->
     <header>
-        <h1>{{ name }}</h1>
-        <nav>
-            <a href="/">Меню</a>
-            <a href="/about">Про нас</a>
+        <nav class="navbar">
+            <h1 class="logo"><span>Velvet</span> Bite</h1>
+            <ul class="nav-links">
+                <li><a href="/#home">Головна</a></li>
+                <li><a href="/#menu">Меню</a></li>
+                <li><a href="/#contact">Контакти</a></li>
+                <li><a href="/about">Про нас</a></li>
+            </ul>
         </nav>
     </header>
 
-    <main class="dish-details">
-        {% if dish %}
-            <img src="{{ url_for('static', filename=dish.image) }}" alt="{{ name }}">
-            <p>{{ dish.text }}</p>
-        {% else %}
-            <p>Такої страви не знайдено 😢</p>
-        {% endif %}
+    <main>
+        <section class="werh">
+            <a href="/#menu" class="werh-btn">← Назад до меню</a>
+            <h1 class="dish">{{ dish.name }}</h1>
+        </section>
+
+        <section class="dish-detail">
+            <img src="{{ url_for('static', filename=dish.image) }}" alt="{{ dish.name }}">
+            <div class="dish-info">
+                
+                <p><strong>Опис:</strong> {{ dish.description }}</p>
+                <p><strong>Ціна:</strong> {{ dish.price }}</p>
+                <p><strong>Інгредієнти:</strong></p>
+                <ul>
+                    {% for ingredient in dish.ingredients %}
+                    <li>{{ ingredient }}</li>
+                    {% endfor %}
+                </ul>
+                <p><strong>Калорійність:</strong> {{ dish.calories }} ккал</p>
+            </div>
+        </section>
+
     </main>
 
+     <!-- Футер -->
     <footer>
-        <a href="/">← Назад до меню</a>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
     </footer>
+
+    <script src="static/script.js"></script>
 </body>
 </html>
