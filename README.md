@@ -110,6 +110,7 @@ git commit -m "feat: fiksyla faily"
 git commit -m "feat: flask"
 git commit -m "feat: fix site"
 git commit -m "feat: update README.md, added CHANGLELOG.md, added laba-2-report.md"
+git commit -m "feat: update laba-2-report.md"
 
 5)Публікація змін на GitHub
 git push origin feature/menu
