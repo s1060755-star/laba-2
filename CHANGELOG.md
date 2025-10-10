@@ -28,3 +28,4 @@
 - Додано файли CHANGELOG.md , laba-2-report.md
 ### Changed
 - Оновлено файл README.md з детальним описом проєкту
+- Оновлено файл laba-2-report.md
