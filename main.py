@@ -76,6 +76,21 @@ def dish(dish_id):
 def about():
     return render_template('about.html')
 
+# --- Сорінка "Наші послуги" ---
+@app.route('/service')
+def service():
+    return render_template('service.html')
+
+# --- Сторінка "Наші локації" ---
+@app.route('/locate')
+def locate():
+    return render_template('locate.html')
+
+# --- Сторінка "Приєднуйся до нас" ---
+@app.route('/work')
+def work():
+    return render_template('work.html')
+
 # --- Запуск програми ---
 if __name__ == '__main__':
     app.run(debug=True)

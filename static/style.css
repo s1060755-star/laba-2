@@ -20,13 +20,14 @@ body {
   min-height: 100vh; 
 }
 
-/* Навбар */
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 12px 60px;
     background: #2C1B18;
+    position: relative; /* для правильного абсолютного позиціонування меню */
+    z-index: 999;
 }
 
 .logo {
@@ -48,7 +49,21 @@ body {
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 25px;
+    flex-direction: column;
+    position: fixed;       
+    top: 0;
+    left: -250px;          
+    width: 250px;
+    height: 100%;
+    background: #2C1B18;
+    padding: 60px 20px;    
+    gap: 20px;
+    transition: left 0.3s ease; 
+    z-index: 1000;
+}
+
+.nav-links.show {
+    left: 0; 
 }
 
 .nav-links a {
@@ -59,11 +74,25 @@ body {
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+    font-size: 18px;
 }
 
 .nav-links a:hover {
     color: #ffcc80;
 }
+
+.menu-toggle {
+    display: block;
+    font-size: 30px;
+    color: #ffcc80;
+    cursor: pointer;
+    user-select: none;
+    position: fixed; 
+    top: 12px;
+    left: 20px;
+    z-index: 1100;
+}
+
 
 /*  Герой-секція */
 .hero {
@@ -94,6 +123,64 @@ body {
     font-style: normal;
 }
 
+.hero2 {
+    text-align: center;
+    padding: 80px 20px; 
+    background: url('images/banner2.jpg') no-repeat center center/cover;
+    height: 35vh; 
+    color: #ffcc80;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;   
+    
+}
+
+.hero2 h1 {
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.hero2 p {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+.hero3 {
+    text-align: center;
+    padding: 80px 20px; 
+    background: url('images/banner1.jpg') no-repeat center center/cover;
+    height: 35vh; 
+    color: #ffcc80;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center;   
+}
+
+.hero3 h1 {
+    font-size: 2.8em;
+    margin-bottom: 15px;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.hero3 p {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 500;
+    font-style: normal;
+}
+
+/* Кнопки */
 .btn {
     display: inline-block;
     background: #ffcc80;
@@ -198,6 +285,7 @@ body {
     text-align: center;
     background: #ae5c5c;
     padding: 80px 20px;
+    margin-top: 5px;
 }
 
 .contact-text {

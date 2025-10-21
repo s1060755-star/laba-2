@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Приєднуйся до нас! — Velvet Bite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+</head>
+<body>
+    <header>
+         <nav class="navbar">
+            <div class="menu-toggle" id="menu-toggle">
+                &#9776;
+            </div>
+
+            <h1 class="logo"><span>Velvet</span> Bite</h1>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/#home">Головна</a></li>
+                <li><a href="/#menu">Меню</a></li>
+                <li><a href="/#contact">Контакти</a></li>
+                <li><a href="/about">Про нас</a></li>
+                <li><a href="/service">Наші послуги</a></li>
+                <li><a href="/locate">Наші локації</a></li>
+                <li><a href="/work">Приєднуйтеся до нас</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero3">
+            <h1>Ставай частиною нашої команди!</h1>
+            <p>Розвивайся разом з нами</p>
+            <a href="#forma" class="btn">Заповнюй форму</a>
+        </section>
+        
+        <!-- Форма -->
+        <section id="forma" class="contact-section">
+            <h2 class="contact-text">Надайте необхідні данні і ми з вами зв'яжемося</h2>
+            <form class="contact-form">
+                <input type="text" placeholder="Ваше ім’я" required>
+                <input type="phone" placeholder="Ваш номер телефону" required>
+                <input type="email" placeholder="Ваш email" required>
+                <textarea rows="profecion" placeholder="Напишіть бажану професію"></textarea>
+                <button type="submit">Надіслати</button>
+            </form>
+        </section>
+
+    <footer>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
+    </footer>
+
+    <script src="static/script.js"></script>
+</body>
+</html>
+
