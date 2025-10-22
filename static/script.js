@@ -7,4 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
     navLinks.classList.toggle('show');
   });
 
+  // --- Показати більше позицій ---
+  const showMoreBtn = document.getElementById('showMoreBtn');
+  if (showMoreBtn) {
+    showMoreBtn.addEventListener('click', () => {
+      document.querySelectorAll('.hidden-item').forEach(item => {
+        item.style.display = 'block';
+      });
+      showMoreBtn.parentElement.style.display = 'none';
+    });
+  }
 });

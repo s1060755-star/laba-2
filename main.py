@@ -19,8 +19,8 @@ menu_items = [
         "price": "65 грн",
         "image": "images/latte.jpg",
         "description": "Класичний лате з нотками вишні та легкою пінкою",
-        "ingredients": ["бісквіт", "крем", "цукор"],
-        "calories": 350
+        "ingredients": ["кава", "молоко", "вишня"],
+        "calories": 200
     },
     {
         "id": 3,
@@ -28,8 +28,8 @@ menu_items = [
         "price": "80 грн",
         "image": "images/cheesecakechery.jpg",
         "description": "Домашній сирник з вишнею та карамельним соусом",
-        "ingredients": ["бісквіт", "крем", "цукор"],
-        "calories": 350
+        "ingredients": ["бісквіт", "сирний крем", "цукор", "вишня"],
+        "calories": 450
     },
     {
         "id": 4,
@@ -37,8 +37,8 @@ menu_items = [
         "price": "70 грн",
         "image": "images/cheesecake.jpg",
         "description": "Домашній сирник з вершковим сиром",
-        "ingredients": ["бісквіт", "крем", "цукор"],
-        "calories": 350
+        "ingredients": ["бісквіт", "сирний крем", "цукор"],
+        "calories": 400
     },
     {
         "id": 5,
@@ -46,8 +46,8 @@ menu_items = [
         "price": "65 грн",
         "image": "images/kapych.jpg",
         "description": "Ніжна кава з молочною піною",
-        "ingredients": ["бісквіт", "крем", "цукор"],
-        "calories": 350
+        "ingredients": ["кава", "молоко"],
+        "calories": 150
     },
     {
         "id": 6,
@@ -55,7 +55,34 @@ menu_items = [
         "price": "55 грн",
         "image": "images/americano.jpg",
         "description": "Справжня класика кавового смаку",
-        "ingredients": ["бісквіт", "крем", "цукор"],
+        "ingredients": ["кава"],
+        "calories": 80 
+    },
+    {
+        "id": 7,
+        "name": "Еклер з ваніллю",
+        "price": "65 грн",
+        "image": "images/eclerwanile.jpg",
+        "description": "Французька класика випічки з приємними нотками ванілі",
+        "ingredients": ["листкове тісто", "крем", "цукор", "ваніль"],
+        "calories": 445
+    },
+    {
+        "id": 8,
+        "name": "Еклер з полуницею",
+        "price": "80 грн",
+        "image": "images/eclerstrowbery.jpg",
+        "description": "Французька класика випічки з полуницею",
+        "ingredients": ["бісквіт", "крем", "цукор", "полуниця"],
+        "calories": 500
+    },
+    {
+        "id": 9,
+        "name": "Крем брюле",
+        "price": "65 грн",
+        "image": "images/krembrule.jpg",
+        "description": "Ніжний смак та хрустка скоринка",
+        "ingredients": ["крем", "цукор", "карамель"],
         "calories": 350
     }
 ]

@@ -19,6 +19,8 @@
             
             <h1 class="logo"><span>Velvet</span> Bite</h1>
 
+            <h2 class="navigation">Головна</h2>
+
             <ul class="nav-links" id="nav-links">
                 <li><a href="#home">Головна</a></li>
                 <li><a href="#menu">Меню</a></li>
@@ -43,7 +45,7 @@
             <h2>Наше меню</h2>
             <div class="menu-grid">
                 {% for dish in menu_items %}
-                <div class="menu-item">
+                <div class="menu-item {% if loop.index > 6 %}hidden-item{% endif %}">
                     <a href="{{ url_for('dish', dish_id=dish.id) }}">
                         <img src="{{ url_for('static', filename=dish.image) }}" alt="{{ dish.name }}">
                         <h3>{{ dish.name }}</h3>
@@ -53,7 +55,14 @@
                 </div>
                 {% endfor %}
             </div>
+
+            <div class="show-more-line">
+                <hr>
+                <button id="showMoreBtn">Переглянути більше позицій</button>
+                <hr>
+            </div>
         </section>
+
 
         <section class="hero2">
             <h1>Святкуйте свої День народження у нас!</h1>
