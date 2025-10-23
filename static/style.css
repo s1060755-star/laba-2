@@ -28,6 +28,7 @@ body {
     background: #2C1B18;
     position: relative; 
     z-index: 999;
+    flex-direction: row;
 }
 
 .logo {
@@ -36,6 +37,7 @@ body {
   color: #ffcc80;
   letter-spacing: 2px;
   font-size: 30px;
+  margin-left: 10px;
 }
 
 .logo span {
@@ -77,20 +79,46 @@ body {
     font-size: 18px;
 }
 
-.nav-links a:hover {
-    color: #ffcc80;
+/* Кнопка меню */
+.menu-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 22px;
+  cursor: pointer;
+  z-index: 1001;
+  transition: all 0.3s ease;
+  margin-left: 5px;
+  position: fixed;
+  left: 18px;
+  top: 22px;
 }
 
-.menu-toggle {
-    display: block;
-    font-size: 30px;
-    color: #ffcc80;
-    cursor: pointer;
-    user-select: none;
-    position: fixed; 
-    top: 12px;
-    left: 20px;
-    z-index: 1100;
+.menu-toggle span {
+  display: block;
+  height: 4px;
+  width: 100%;
+  background: #ffcc80;
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.menu-toggle:hover span {
+  background: #ae5c5c;
+}
+
+/* Перетворення на хрестик */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
 }
 
 
@@ -246,6 +274,7 @@ body {
 
 .menu-item:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 .menu-item img {
@@ -334,7 +363,7 @@ footer {
     padding: 15px 0;
 }
 
-.werh-btn{
+.dish-btn{
     margin-left: 80px;
     display: inline-block;
     background: #ffcc80;
@@ -350,7 +379,7 @@ footer {
     font-style: normal;
 }
 
-.werh h1 {
+.dish h1 {
     font-size: 38px;
     color: #4B2E2B;
     text-align: center;
@@ -373,6 +402,7 @@ footer {
 
 .dish-info {
     max-width: 500px; 
+    font-size: 25px;
 }
 
 .dish-info h1 {
@@ -382,6 +412,7 @@ footer {
 .dish-info ul {
     list-style: disc;
     padding-left: 20px;
+    margin-left: 25px;
 }
 
 @media (max-width: 768px) {
@@ -395,17 +426,34 @@ footer {
     }
 }
 
+.info {
+    display: flex;         
+    justify-content: space-between; 
+    align-items: flex-start; 
+    gap: 50px;              
+    padding: 20px;
+}
+
 .about-text {
     font-family: "Montserrat", sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 500;
     font-style: normal;
-    text-align: center;
-    margin-left: 200px;
-    margin-right: 200px;
+    text-align: left;       
     margin-top: 50px;
-    font-size: 35px;
+    font-size: 25px;
+    flex: 1;    
+    padding-right: 17px;   
+    border-right: 2px solid #3e2723; 
+    margin-left: 25px;           
 }
+
+.info-cont {
+    flex: 0 0 350px;      
+    font-size: 20px;
+    margin-right: 25px;
+    margin-top: 25px;
+    padding-left: 12px;
+}
+
 
 main, .menu-section, .contact-section, .dish-detail {
     flex: 1;
@@ -450,7 +498,7 @@ a:active {
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 8px;
+    border-radius: 25px;
     cursor: pointer;
     font-size: 16px;
     transition: background 0.3s;
@@ -482,18 +530,21 @@ a:active {
 .services {
     text-align: center;
     margin-top: 30px;
+    font-size: 50px;
 }
 
 .services-1 {
     margin-left: 40px;
     margin-top: 20px;
     margin-right: 40px;
+    font-size: 30px;
 }
 
 .services-1-text {
     margin-left: 40px;
     margin-top: 7px;
     margin-right: 40px;
+    font-size: 25px;
 }
 
 .services-1-text-ul {
@@ -501,6 +552,7 @@ a:active {
     margin-left: 70px;
     margin-top: 7px;
     margin-right: 40px;
+    font-size: 25px;
 }
 
 .img-room {
@@ -513,9 +565,9 @@ a:active {
 }
 
 .img-room img {
-    width: 200px;   
-    max-width: 210px;      
-    height: 200px;             
+    width: 210px;   
+    max-width: 300px;      
+    height: 210px;             
     border-radius: 20px; 
     object-fit: cover;  
 }
@@ -525,4 +577,32 @@ a:active {
     margin-top: 20px;
     margin-right: 40px;
     margin-bottom: 20px;
+    font-size: 35px;
+    text-align: center;
 }
+
+.maps {
+    width: 100vw;        
+    height: 33vh;
+    padding: 15px 0;
+}
+
+.loc {
+    font-size: 45px;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.loc-text {
+    font-size: 22px;
+    margin-left: 50px;
+    margin-bottom: 15px;
+    margin-top: 17px;
+    margin-right: 50px;
+}
+
+.loc-text-ab {
+    margin-top: 15px;
+    display: block;
+}
+
