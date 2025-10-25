@@ -284,6 +284,7 @@ def work():
 ![Work](Screenshots/Work1.png)
 ![Work](Screenshots/Work2.png)
 
+![Dish](Screenshots/Dish.png)
 
 ### Висновки
 
