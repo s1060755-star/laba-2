@@ -285,6 +285,8 @@ def work():
 ![Work](Screenshots/Work2.png)
 
 
+![Dish](Screenshots/Dish.png)
+
 ### Висновки
 
 Опишіть:
