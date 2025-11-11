@@ -606,3 +606,51 @@ a:active {
     display: block;
 }
 
+.dish-order {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.account-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffcc80;
+    color: #3e2723;
+    padding: 12px 35px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.2s;
+    font-family: "Montserrat", sans-serif;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+    width: 200px; 
+    margin: 20px auto; 
+    margin-top: auto;
+}
+
+.account-btn:hover {
+    background-color: #ae5c5c;
+    transform: scale(1.03);
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.account-text {
+    font-size: 16px;
+    color: #4B2E2B;
+    font-weight: 500;
+    text-align: center;
+}
+
+.navbar-account {
+    padding: 350px 0;
+}

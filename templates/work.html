@@ -25,6 +25,7 @@
             <ul class="nav-links" id="nav-links">
                 <li><a href="/#home">Головна</a></li>
                 <li><a href="/#menu">Меню</a></li>
+                <li><a href="/favourite">Улюблені страви</a></li>
                 <li><a href="/#contact">Зв'язок</a></li>
                 <li><a href="/about">Про нас</a></li>
                 <li><a href="/service">Наші послуги</a></li>
@@ -60,7 +61,7 @@
         <p>© 2025 Velvet Bite. Всі права захищені.</p>
     </footer>
 
-    <script src="static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
 

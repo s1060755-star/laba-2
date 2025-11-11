@@ -2,25 +2,28 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>{{ dish.name }} | Velvet Bite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Bite — Замовлення</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
 </head>
-</head>
-
 <body>
     <!-- Навігація -->
     <header>
         <nav class="navbar">
-            <div class="menu-toggle" id="menu-toggle">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="left-group">
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
             </div>
-            
-            <h1 class="logo"><span>Velvet</span> Bite</h1>
+
+            <h2 class="navigation">Замовлення</h2>
 
             <ul class="nav-links" id="nav-links">
                 <li><a href="/#home">Головна</a></li>
@@ -35,29 +38,8 @@
         </nav>
     </header>
 
-    <main>
-        <section class="dish">
-            <a href="/#menu" class="dish-btn">← Назад до меню</a>
-            <h1 class="dish-name">{{ dish.name }}</h1>
-        </section>
 
-        <section class="dish-detail">
-            <img src="{{ url_for('static', filename=dish.image) }}" alt="{{ dish.name }}">
-            <div class="dish-info">
-                
-                <p><strong>Опис:</strong> {{ dish.description }}</p>
-                <p><strong>Ціна:</strong> {{ dish.price }}</p>
-                <p><strong>Інгредієнти:</strong> {{ dish.ingredients }}</p>
-                <p><strong>Калорійність:</strong> {{ dish.calories }} ккал</p>
-            </div>
-        </section>
-
-        <section class="dish-order">
-            <a href="/#order" class="dish-btn">Додати до замовлення</a>
-        </section>
-    </main>
-
-     <!-- Футер -->
+        <!-- Футер -->
     <footer>
         <p>© 2025 Velvet Bite. Всі права захищені.</p>
     </footer>
