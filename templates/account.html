@@ -35,10 +35,17 @@
                 <li><a href="/locate">Наші локації</a></li>
                 <li><a href="/work">Приєднуйтеся до нас</a></li>
                 <li class="navbar-account">
-                    <a href="/signUp" class="account-btn">
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('account') }}" class="account-btn">
                         <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
                         <span class="account-text">Мій профіль</span>
                     </a>
+                    {% else %}
+                    <a href="{{ url_for('signUp') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% endif %}
                 </li>
             </ul>
         </nav>
@@ -46,16 +53,71 @@
 
 
     <main>
-        <section class="account-section" style="max-width:800px;margin:24px auto;">
-            <h2>Профіль</h2>
-            {% if account %}
-                <p><strong>Ім'я:</strong> {{ account.first_name }}</p>
-                <p><strong>Прізвище:</strong> {{ account.last_name }}</p>
-                <p><strong>Email:</strong> {{ account.email }}</p>
-                <p><strong>Телефон:</strong> {{ account.phone }}</p>
-            {% else %}
-                <p>Ви не авторизовані. Будь ласка, <a href="{{ url_for('signUp') }}">увійдіть</a>.</p>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
             {% endif %}
+        {% endwith %}
+
+        <section class="account-section" style="max-width:900px;margin:24px auto;display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:start;">
+            <div>
+                <img src="{{ account.avatar if account and account.avatar else url_for('static', filename='images/avatar.jpg') }}" alt="Аватар" style="width:180px;height:180px;border-radius:12px;object-fit:cover;display:block;margin-bottom:12px">
+                <a href="{{ url_for('account_edit') }}" class="btn">Редагувати профіль</a>
+                <form method="get" action="{{ url_for('logout') }}" style="margin-top:8px">
+                    <button class="btn-logout" type="submit">Вийти</button>
+                </form>
+            </div>
+            <div>
+                <h2>Профіль</h2>
+                {% if account %}
+                    <p><strong>Ім'я:</strong> {{ account.first_name }}</p>
+                    <p><strong>Прізвище:</strong> {{ account.last_name }}</p>
+                    <p><strong>Email:</strong> {{ account.email }}</p>
+                    <p><strong>Телефон:</strong> {{ account.phone }}</p>
+                    <p><strong>Про мене:</strong> {{ account.bio or '—' }}</p>
+
+                    <h3 style="margin-top:18px">Улюблені страви</h3>
+                    {% if favourites and favourites|length > 0 %}
+                        <ul>
+                        {% for f in favourites %}
+                            <li style="margin-bottom:8px">
+                                <a href="{{ url_for('dish', dish_id=f.dish_id) }}">{{ f.name }}</a>
+                                <form method="post" action="{{ url_for('remove_from_favourite', dish_id=f.dish_id) }}" style="display:inline; margin-left:8px">
+                                    <button class="btn" type="submit">Видалити</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>У вас ще немає улюблених страв.</p>
+                    {% endif %}
+
+                    <h3 style="margin-top:18px">Мої замовлення</h3>
+                    {% if orders and orders|length > 0 %}
+                        <table style="width:100%;border-collapse:collapse">
+                            <thead><tr><th>ID</th><th>Страви</th><th>Сума</th><th>Статус</th></tr></thead>
+                            <tbody>
+                                {% for o in orders %}
+                                <tr>
+                                    <td>{{ o.id }}</td>
+                                    <td>{{ (o.items_text if o.items_text is defined else o.items) }}</td>
+                                    <td>{{ o.total }}</td>
+                                    <td>{{ o.status or 'new' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p>Поки що немає замовлень.</p>
+                    {% endif %}
+                {% else %}
+                    <p>Ви не авторизовані. Будь ласка, <a href="{{ url_for('signUp') }}">увійдіть</a>.</p>
+                {% endif %}
+            </div>
         </section>
     </main>
 

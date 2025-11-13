@@ -42,6 +42,15 @@
     </header>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
         <section class="dish">
             <a href="/#menu" class="dish-btn">← Назад до меню</a>
             <h1 class="dish-name">{{ dish.name }}</h1>
@@ -52,7 +61,7 @@
             <div class="dish-info">
                 
                 <p><strong>Опис:</strong> {{ dish.description }}</p>
-                <p><strong>Ціна:</strong> {{ dish.price }}</p>
+                <p><strong>Ціна:</strong> {{ dish.price|int }} грн</p>
                 <p><strong>Інгредієнти:</strong> {{ dish.ingredients }}</p>
                 <p><strong>Калорійність:</strong> {{ dish.calories }} ккал</p>
             </div>
@@ -69,11 +78,8 @@
             </form>
             {% endif %}
 
-            <form method="post" action="{{ url_for('create_order') }}" style="display:inline">
-                <input type="hidden" name="dish_id" value="{{ dish.id }}">
-                <input type="number" name="qty" value="1" min="1" style="width:60px">
-                <button type="submit" class="dish-btn">Додати до замовлення</button>
-            </form>
+            <!-- Redirect to order page to choose items there (preselect this dish) -->
+            <a class="dish-btn" href="{{ url_for('order') }}?dish_id={{ dish.id }}&qty=1">Додати до замовлення</a>
         </section>
     </main>
 

@@ -79,26 +79,48 @@ def get_all_accounts():
     return accounts
 
 
-def get_all_favourites():
+def get_all_favourites(account_id=None):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('SELECT f.id, f.dish_id, d.name, d.price, d.image FROM favourites f LEFT JOIN dish d ON f.dish_id = d.id')
+    if account_id is None:
+        cursor.execute('SELECT f.id, f.dish_id, d.name, d.price, d.image, f.account_id FROM favourites f LEFT JOIN dish d ON f.dish_id = d.id')
+    else:
+        cursor.execute('SELECT f.id, f.dish_id, d.name, d.price, d.image FROM favourites f LEFT JOIN dish d ON f.dish_id = d.id WHERE f.account_id = ?', (account_id,))
     favs = cursor.fetchall()
     return favs
 
 
-def get_favourite_by_dish(dish_id):
+def get_favourite_by_dish(dish_id, account_id=None):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('SELECT * FROM favourites WHERE dish_id = ? LIMIT 1', (dish_id,))
+    if account_id is None:
+        cursor.execute('SELECT * FROM favourites WHERE dish_id = ? LIMIT 1', (dish_id,))
+    else:
+        cursor.execute('SELECT * FROM favourites WHERE dish_id = ? AND account_id = ? LIMIT 1', (dish_id, account_id))
     return cursor.fetchone()
 
 
-def delete_favourite_by_dish(dish_id):
+def delete_favourite_by_dish(dish_id, account_id=None):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('DELETE FROM favourites WHERE dish_id = ?', (dish_id,))
+    if account_id is None:
+        cursor.execute('DELETE FROM favourites WHERE dish_id = ?', (dish_id,))
+    else:
+        cursor.execute('DELETE FROM favourites WHERE dish_id = ? AND account_id = ?', (dish_id, account_id))
     db.commit()
+
+def add_favourite(dish_id, account_id=None):
+    db = get_db()
+    cursor = db.cursor()
+    if account_id is None:
+        cursor.execute('INSERT INTO favourites (dish_id) VALUES (?)', (dish_id,))
+    else:
+        # avoid duplicate favourites for same user+dish
+        cursor.execute('SELECT id FROM favourites WHERE dish_id = ? AND account_id = ?', (dish_id, account_id))
+        if cursor.fetchone() is None:
+            cursor.execute('INSERT INTO favourites (dish_id, account_id) VALUES (?, ?)', (dish_id, account_id))
+    db.commit()
+    return cursor.lastrowid
 
 # --- Функції для ініціалізації/адміністрації ---
 def init_db():
@@ -150,15 +172,62 @@ def init_db():
             first_name TEXT,
             last_name TEXT,
             phone TEXT,
-            email TEXT
+            email TEXT,
+            avatar TEXT DEFAULT '',
+            bio TEXT DEFAULT ''
         )
     ''')
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS favourites (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            dish_id INTEGER
+            dish_id INTEGER,
+            account_id INTEGER
         )
     ''')
+    # If an older DB exists without account_id column, try to add it
+    try:
+        cursor.execute("ALTER TABLE favourites ADD COLUMN account_id INTEGER")
+    except Exception:
+        pass
+    # Try to add avatar and bio columns to accounts in older DBs
+    try:
+        cursor.execute("ALTER TABLE accounts ADD COLUMN avatar TEXT DEFAULT ''")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE accounts ADD COLUMN bio TEXT DEFAULT ''")
+    except Exception:
+        pass
+    # Ensure older DBs have 'phone' column on accounts and orders
+    try:
+        cursor.execute("ALTER TABLE accounts ADD COLUMN phone TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN phone TEXT")
+    except Exception:
+        pass
+    # Ensure address/items/total/created_at/status exist on orders (no-op if already present)
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN address TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN items TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN total REAL")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN created_at TEXT")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT")
+    except Exception:
+        pass
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS admin_accounts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -205,20 +274,38 @@ def add_feedback(name, email, text):
 def add_account(first_name, last_name, phone, email):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute(
-        'INSERT INTO accounts (first_name, last_name, phone, email) VALUES (?, ?, ?, ?)',
-        (first_name, last_name, phone, email)
-    )
+    try:
+        cursor.execute(
+            'INSERT INTO accounts (first_name, last_name, phone, email, avatar, bio) VALUES (?, ?, ?, ?, ?, ?)',
+            (first_name, last_name, phone, email, '', '')
+        )
+    except Exception:
+        cursor.execute(
+            'INSERT INTO accounts (first_name, last_name, phone, email) VALUES (?, ?, ?, ?)',
+            (first_name, last_name, phone, email)
+        )
     db.commit()
     return cursor.lastrowid
 
 
-def add_favourite(dish_id):
+def update_account_profile(account_id, first_name, last_name, phone, email, avatar='', bio=''):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute('INSERT INTO favourites (dish_id) VALUES (?)', (dish_id,))
+    try:
+        cursor.execute('UPDATE accounts SET first_name = ?, last_name = ?, phone = ?, email = ?, avatar = ?, bio = ? WHERE id = ?',
+                       (first_name, last_name, phone, email, avatar, bio, account_id))
+    except Exception:
+        cursor.execute('UPDATE accounts SET first_name = ?, last_name = ?, phone = ?, email = ? WHERE id = ?',
+                       (first_name, last_name, phone, email, account_id))
     db.commit()
-    return cursor.lastrowid
+
+
+def get_orders_by_phone(phone):
+    db = get_db()
+    cursor = db.cursor()
+    cursor.execute('SELECT * FROM orders WHERE phone = ? ORDER BY created_at DESC', (phone,))
+    return cursor.fetchall()
+
 
 
 def add_order(customer_name, phone, address, items, total):
@@ -238,9 +325,17 @@ def add_admin(username, password):
     db = get_db()
     cursor = db.cursor()
     pw_hash = generate_password_hash(password)
-    cursor.execute('INSERT OR IGNORE INTO admin_accounts (username, password_hash) VALUES (?, ?)', (username, pw_hash))
-    db.commit()
-    return cursor.lastrowid
+    # If admin exists, update password. Otherwise insert.
+    cursor.execute('SELECT id FROM admin_accounts WHERE username = ?', (username,))
+    row = cursor.fetchone()
+    if row:
+        cursor.execute('UPDATE admin_accounts SET password_hash = ? WHERE username = ?', (pw_hash, username))
+        db.commit()
+        return row['id'] if 'id' in row.keys() else row[0]
+    else:
+        cursor.execute('INSERT INTO admin_accounts (username, password_hash) VALUES (?, ?)', (username, pw_hash))
+        db.commit()
+        return cursor.lastrowid
 
 
 def get_admin_by_username(username):

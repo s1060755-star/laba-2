@@ -23,6 +23,7 @@
                 <h1 class="logo"><span>Velvet</span> Bite</h1>
             </div>
 
+            <a href="{{ url_for('order') }}" class="cart-btn" title="Замовлення">Зробити замовлення</a>
             <h2 class="navigation">Улюблені страви</h2>
 
             <ul class="nav-links" id="nav-links">
@@ -35,18 +36,35 @@
                 <li><a href="/locate">Наші локації</a></li>
                 <li><a href="/work">Приєднуйтеся до нас</a></li>
                 <li class="navbar-account">
-                    <a href="/signUp" class="account-btn">
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('account') }}" class="account-btn">
                         <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
                         <span class="account-text">Мій профіль</span>
                     </a>
+                    {% else %}
+                    <a href="{{ url_for('signUp') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% endif %}
                 </li>
             </ul>
         </nav>
     </header>
 
     <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <section class="favourites-list">
-            <h2>Ваші улюблені страви</h2>
+            <h1>Ваші улюблені страви</h1>
             {% if favourites and favourites|length > 0 %}
                 <div class="menu-grid">
                 {% for f in favourites %}
@@ -57,9 +75,9 @@
                             {% endif %}
                             <h3>{{ f.name }}</h3>
                         </a>
-                        <p>Ціна: {{ f.price }}</p>
-                        <form method="post" action="{{ url_for('add_to_favourite', dish_id=f.dish_id) }}">
-                            <button type="submit">Додати ще раз</button>
+                        <p>Ціна: {{ f.price|int }} грн</p>
+                        <form method="post" action="{{ url_for('remove_from_favourite', dish_id=f.dish_id) }}">
+                            <button type="submit">Видалити з улюблених</button>
                         </form>
                     </div>
                 {% endfor %}

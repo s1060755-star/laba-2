@@ -5,8 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .admin-back-btn{
+            position: fixed;
+            left: 14px;
+            top: 50px;
+            z-index: 2500;
+            background:#2C1B18;
+            color:#ffcc80;
+            border:2px solid #4B2E2B;
+            padding:8px 12px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:700;
+            box-shadow:0 6px 18px rgba(0,0,0,0.08);
+        }
+        .admin-back-btn:hover{ background:#f7f3f1 }
+        
+        .navigation-admin-login {
+            margin-left: auto !important;
+            margin-right: 0px !important;
+            color: #ffcc80;
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <nav class="navbar">
+            <div class="left-group">
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
+            </div>
+
+            <h2 class="navigation-admin-login">Вхід в адмін-панель</h2>
+
+            <div class="navbar-menu">
+                <ul class="nav-links" id="nav-links">
+                    <li><a href="/#home">Головна</a></li>
+                    <li><a href="/#menu">Меню</a></li>
+                    <li><a href="/favourite">Улюблені страви</a></li>
+                    <li><a href="/#contact">Зв'язок</a></li>
+                    <li><a href="/about">Про нас</a></li>
+                    <li><a href="/service">Наші послуги</a></li>
+                    <li><a href="/locate">Наші локації</a></li>
+                    <li><a href="/work">Приєднуйтеся до нас</a></li>
+                    <li class="navbar-account">
+                        {% if session.get('user_id') %}
+                        <a href="{{ url_for('account') }}" class="account-btn">
+                            <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                            <span class="account-text">Мій профіль</span>
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('signUp') }}" class="account-btn">
+                            <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                            <span class="account-text">Мій профіль</span>
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
+
+            </div>
+            
+        </nav>
+    </header>
     <main class="login-page">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -23,9 +89,11 @@
             <input type="text" name="username" required>
             <label>Пароль</label>
             <input type="password" name="password" required>
-            <button type="submit">Увійти</button>
+            <button type="submit" class="btn">Увійти</button>
         </form>
-        <p><a href="{{ url_for('index') }}">Повернутися на сайт</a></p>
+        <div style="margin-top:14px">
+            <a href="{{ url_for('index') }}" class="btn admin-back-btn">Повернутися на сайт</a>
+        </div>
     </main>
 </body>
 </html>

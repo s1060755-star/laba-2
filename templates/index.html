@@ -23,6 +23,7 @@
                 <h1 class="logo"><span>Velvet</span> Bite</h1>
             </div>
 
+            <a href="{{ url_for('order') }}" class="cart-btn" title="Замовлення">Зробити замовлення</a>
             <h2 class="navigation">Головна</h2>
 
             <div class="navbar-menu">
@@ -36,10 +37,17 @@
                     <li><a href="/locate">Наші локації</a></li>
                     <li><a href="/work">Приєднуйтеся до нас</a></li>
                     <li class="navbar-account">
-                        <a href="/signUp" class="account-btn">
+                        {% if session.get('user_id') %}
+                        <a href="{{ url_for('account') }}" class="account-btn">
                             <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
                             <span class="account-text">Мій профіль</span>
                         </a>
+                        {% else %}
+                        <a href="{{ url_for('signUp') }}" class="account-btn">
+                            <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                            <span class="account-text">Мій профіль</span>
+                        </a>
+                        {% endif %}
                     </li>
                 </ul>
 
@@ -66,7 +74,7 @@
                         <h3>{{ dish.name }}</h3>
                     </a>
                     <p>{{ dish.description }}</p>
-                    <span>{{ dish.price }}</span>
+                    <span>{{ dish.price|int }} грн</span>
                 </div>
                 {% endfor %}
             </div>
