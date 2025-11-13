@@ -654,3 +654,56 @@ a:active {
 .navbar-account {
     padding: 350px 0;
 }
+
+.signUp-form {
+    text-align: center;
+    background: #ae5c5c;
+    padding: 181px 20px;
+}
+
+.signUp-form-text {
+    color: #ffcc80;
+    height: 50px;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: bold;
+    font-style: normal;
+}
+
+.signUp-form-in {
+    max-width: 500px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.signUp-form-in input{
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.signUp-form-in a {
+    display: inline-block;
+    background: #ffcc80;
+    color: #3e2723;
+    padding: 10px 20px;
+    margin-top: 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.signUp-form-in a:hover {
+    background: #ffe0b2;
+}
+
+.signUp-btn-account:enabled {
+    background-color: #ccc;
+    cursor: pointer;
+}

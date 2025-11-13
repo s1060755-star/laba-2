@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="login-page">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <h2>Вхід в адмін-панель</h2>
+        <form method="post" action="{{ url_for('admin_login') }}" class="admin-login-form">
+            <label>Ім'я користувача</label>
+            <input type="text" name="username" required>
+            <label>Пароль</label>
+            <input type="password" name="password" required>
+            <button type="submit">Увійти</button>
+        </form>
+        <p><a href="{{ url_for('index') }}">Повернутися на сайт</a></p>
+    </main>
+</body>
+</html>

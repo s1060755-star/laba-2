@@ -85,16 +85,25 @@
             <a href="/service" class="btn">Переглянути більше позицій</a>
         </section>
 
-        <!-- Контакти -->
-        <section id="contact" class="contact-section">
-            <h2 class="contact-text">Зв'яжіться з нами</h2>
-            <form class="contact-form">
-                <input type="text" placeholder="Ваше ім’я" required>
-                <input type="email" placeholder="Ваш email" required>
-                <textarea rows="4" placeholder="Ваше повідомлення"></textarea>
-                <button type="submit">Надіслати</button>
-            </form>
-        </section>
+                <!-- Контакти -->
+                <section id="contact" class="contact-section">
+                        <h2 class="contact-text">Зв'яжіться з нами</h2>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, msg in messages %}
+                                        <div class="flash-{{ category }}">{{ msg }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        <form class="contact-form" method="post" action="{{ url_for('add_feedback_route') }}">
+                                <input type="text" name="name" placeholder="Ваше ім’я" required>
+                                <input type="email" name="email" placeholder="Ваш email" required>
+                                <textarea name="text" rows="4" placeholder="Ваше повідомлення"></textarea>
+                                <button type="submit">Надіслати</button>
+                        </form>
+                </section>
     </main>
 
     <!-- Футер -->
