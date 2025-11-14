@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін панель — Velvet Bite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .admin-container{padding:24px;max-width:1200px;margin:0 auto}
+        .admin-section{margin-bottom:28px}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:8px;border:1px solid #ddd}
+        .btn{background:#333;color:#ffcc80;padding:6px 10px;border:none;cursor:pointer}
+        .btn-danger{background:#b22222;  margin-top: 7px; color:#fff}
+        .controls{display:flex;gap:8px}
+        /* Admin-specific navbar tweaks: ensure burger is visible and move title right */
+        .navbar .menu-toggle { z-index: 3200; left: 12px; top: 12px; position: fixed; }
+        /* Force the admin page title to align right and not overlap the toggle */
+        .navbar > .navigation { margin-left: auto !important; margin-right: 100px !important; text-align: right; position: relative; }
+        /* Ensure nav-links overlay doesn't hide toggle on wide admin pages */
+        .nav-links { left: -250px; }
+        /* Force visible state and pointer events when toggled */
+        .nav-links.show { left: 0 !important; }
+        .menu-toggle { pointer-events: auto !important; }
+        .menu-toggle span { height: 5px; }
+        .muted { margin-bottom: 15px;}
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="left-group">
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
+            </div>
+            <h2 class="navigation">Адмін панель</h2>
+            <div class="right-actions">
+                <a class="btn" href="/">На сайт</a>
+                <a class="btn btn-danger" href="/admin/logout">Вийти</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="admin-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        <section class="admin-section">
+            <h3>Страви</h3>
+            <a class="btn" href="{{ url_for('add_dish_route') }}">Додати нову страву</a>
+            <table>
+                <thead><tr><th>ID</th><th>Назва</th><th>Ціна</th><th>Дії</th></tr></thead>
+                <tbody>
+                    {% for d in dish %}
+                    <tr>
+                        <td>{{ d.id }}</td>
+                        <td>{{ d.name }}</td>
+                           <td>{{ d.price|int }} грн</td>
+                        <td class="controls">
+                            <a class="btn" href="{{ url_for('admin_edit_dish', dish_id=d.id) }}">Редагувати</a>
+                            <form method="post" action="{{ url_for('delete_dish_route', dish_id=d.id) }}" style="display:inline">
+                                <button class="btn btn-danger" type="submit">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-section">
+            <h3>Замовлення</h3>
+            <table>
+                <thead><tr><th>ID</th><th>Клієнт</th><th>Телефон</th><th>Адреса</th><th>Страви</th><th>Сума</th><th>Статус</th><th>Дії</th></tr></thead>
+                <tbody>
+                    {% for o in orders %}
+                    <tr>
+                        <td>{{ o.id }}</td>
+                        <td>{{ o.customer_name }}</td>
+                        <td>{{ o.phone }}</td>
+                        <td>{{ o.address }}</td>
+                        <td>{{ o.items_text }}</td>
+                           <td>{{ o.total|int }} грн</td>
+                        <td>{{ o.status or 'new' }}</td>
+                        <td>
+                            <form method="post" action="{{ url_for('admin_update_order_status', order_id=o.id) }}">
+                                <select name="status">
+                                    <option value="new">Новe</option>
+                                    <option value="pending">Очікування</option>
+                                    <option value="preparing">В приготуванні</option>
+                                    <option value="ready">Готово</option>
+                                    <option value="completed">Завершено</option>
+                                </select>
+                                <button class="btn" type="submit">Оновити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-section">
+            <h3>Відгуки</h3>
+            <table>
+                <thead><tr><th>ID</th><th>Ім'я</th><th>Email</th><th>Повідомлення</th></tr></thead>
+                <tbody>
+                    {% for f in feedback %}
+                    <tr>
+                        <td>{{ f.id }}</td>
+                        <td>{{ f.name }}</td>
+                        <td>{{ f.email }}</td>
+                        <td>{{ f.text }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-section">
+            <h3>Робота (заявки)</h3>
+            <table>
+                <thead><tr><th>ID</th><th>Ім'я</th><th>Телефон</th><th>Email</th></tr></thead>
+                <tbody>
+                    {% for w in work %}
+                    <tr>
+                        <td>{{ w.id }}</td>
+                        <td>{{ w.name }}</td>
+                        <td>{{ w.phone }}</td>
+                        <td>{{ w.email }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="admin-section">
+            <h3>Акаунти</h3>
+            <p class="muted">Додавання та редагування акаунтів вимкнено в адмін-панелі. Видаляти акаунти можна при необхідності.</p>
+            <table>
+                <thead><tr><th>ID</th><th>Ім'я</th><th>Прізвище</th><th>Email</th><th>Дії</th></tr></thead>
+                <tbody>
+                    {% for a in accounts %}
+                    <tr>
+                        <td>{{ a.id }}</td>
+                        <td>{{ a.first_name }}</td>
+                        <td>{{ a.last_name }}</td>
+                        <td>{{ a.email }}</td>
+                        <td class="controls">
+                            <!-- Editing disabled in admin UI -->
+                            <form method="post" action="{{ url_for('delete_accounts_route', service_id=a.id) }}" style="display:inline">
+                                <button class="btn btn-danger" type="submit">Видалити</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p style="text-align:center">© 2025 Velvet Bite.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редагувати акаунт</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>form{max-width:600px;margin:24px auto;padding:16px;border:1px solid #ddd}</style>
+</head>
+<body>
+  <h2 style="text-align:center">Редагувати акаунт</h2>
+  <form method="post">
+    <label>Ім'я</label>
+    <input name="first_name" value="{{ account.first_name }}" required>
+    <label>Прізвище</label>
+    <input name="last_name" value="{{ account.last_name }}" required>
+    <label>Телефон</label>
+    <input name="phone" value="{{ account.phone }}">
+    <label>Email</label>
+    <input name="email" value="{{ account.email }}" required>
+    <button class="btn" type="submit">Зберегти</button>
+    <a class="btn" href="{{ url_for('admin') }}">Скасувати</a>
+  </form>
+</body>
+</html>

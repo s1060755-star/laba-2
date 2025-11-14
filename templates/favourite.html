@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Bite — Меню</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Навігація -->
+    <header>
+        <nav class="navbar">
+            <div class="left-group">
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
+            </div>
+
+            <a href="{{ url_for('order') }}" class="cart-btn" title="Замовлення">Зробити замовлення</a>
+            <h2 class="navigation">Улюблені страви</h2>
+
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/#home">Головна</a></li>
+                <li><a href="/#menu">Меню</a></li>
+                <li><a href="/favourite">Улюблені страви</a></li>
+                <li><a href="/#contact">Зв'язок</a></li>
+                <li><a href="/about">Про нас</a></li>
+                <li><a href="/service">Наші послуги</a></li>
+                <li><a href="/locate">Наші локації</a></li>
+                <li><a href="/work">Приєднуйтеся до нас</a></li>
+                <li class="navbar-account">
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('account') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('signUp') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <section class="favourites-list">
+            <h1>Ваші улюблені страви</h1>
+            {% if favourites and favourites|length > 0 %}
+                <div class="menu-grid">
+                {% for f in favourites %}
+                    <div class="menu-item">
+                        <a href="{{ url_for('dish', dish_id=f.dish_id) }}">
+                            {% if f.image %}
+                                <img src="{{ url_for('static', filename=f.image) }}" alt="{{ f.name }}">
+                            {% endif %}
+                            <h3>{{ f.name }}</h3>
+                        </a>
+                        <p>Ціна: {{ f.price|int }} грн</p>
+                        <form method="post" action="{{ url_for('remove_from_favourite', dish_id=f.dish_id) }}">
+                            <button type="submit">Видалити з улюблених</button>
+                        </form>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <p>У вас поки що немає улюблених страв.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <!-- Футер -->
+    <footer>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+

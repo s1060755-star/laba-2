@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Редагувати страву</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>form{max-width:600px;margin:24px auto;padding:16px;border:1px solid #ddd}</style>
+</head>
+<body>
+  <h2 style="text-align:center">Редагувати страву</h2>
+  <form method="post">
+    <label>Назва</label>
+    <input name="name" value="{{ dish.name }}" required>
+    <label>Ціна</label>
+    <input name="price" type="number" step="0.01" value="{{ dish.price }}" required>
+    <label>Зображення (шлях)</label>
+    <input name="image" value="{{ dish.image }}">
+    <label>Опис</label>
+    <textarea name="description">{{ dish.description }}</textarea>
+    <label>Інгредієнти</label>
+    <input name="ingredients" value="{{ dish.ingredients }}">
+    <label>Калорії</label>
+    <input name="calories" value="{{ dish.calories }}">
+    <button class="btn" type="submit">Зберегти</button>
+    <a class="btn" href="{{ url_for('admin') }}">Скасувати</a>
+  </form>
+</body>
+</html>

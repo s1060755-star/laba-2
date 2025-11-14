@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velvet Bite — Замовлення</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Beau+Rivage&family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Навігація -->
+    <header>
+        <nav class="navbar">
+            <div class="left-group">
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
+            </div>
+
+            <h2 class="navigation">Оформлення замовлення</h2>
+
+        <!-- Футер -->
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/#home">Головна</a></li>
+                <li><a href="/#menu">Меню</a></li>
+                <li><a href="/favourite">Улюблені страви</a></li>
+                <li><a href="/#contact">Зв'язок</a></li>
+                <li><a href="/about">Про нас</a></li>
+                <li><a href="/service">Наші послуги</a></li>
+                <li><a href="/locate">Наші локації</a></li>
+                <li><a href="/work">Приєднуйтеся до нас</a></li>
+                <li class="navbar-account">
+                    {% if session.get('user_id') %}
+                    <a href="{{ url_for('account') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('signUp') }}" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main style="max-width:900px;margin:24px auto">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, msg in messages %}
+                            <div class="flash-{{ category }}">{{ msg }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <section style="display:grid;grid-template-columns:1fr 350px;gap:20px">
+                <div>
+                    <h2>Оформити замовлення</h2>
+                    <form method="post" action="{{ url_for('create_order') }}" style="display:flex;flex-direction:column;gap:10px" id="orderForm">
+                        <label>Ім'я</label>
+                        <input type="text" name="name" placeholder="Ваше ім'я" value="{{ account['first_name'] if account and 'first_name' in account.keys() else '' }}">
+                        <label>Телефон</label>
+                        <input type="text" name="phone" placeholder="Телефон" value="{{ account['phone'] if account and 'phone' in account.keys() else '' }}">
+                            <label>Номер столу</label>
+                            <input type="text" name="address" placeholder="Номер столу (для dine-in)" value="{{ request.args.get('table') or '' }}" required>
+
+                        <label>Додати страву</label>
+                        <div style="display:flex;gap:8px;align-items:center">
+                            <select id="dishSelect" style="flex:1">
+                                <option value="">-- Оберіть страву --</option>
+                                {% for d in dishes %}
+                                    <option value="{{ d['id'] }}" data-price="{{ d['price'] }}">{{ d['name'] }} — {{ d['price']|int }} грн</option>
+                                {% endfor %}
+                            </select>
+                            <input type="number" id="dishQty" min="1" value="1" style="width:80px">
+                            <button type="button" id="addDishBtn" class="btn">Додати</button>
+                        </div>
+
+                        <label>Список товарів</label>
+                        <div id="itemsList" style="min-height:40px;padding:8px;border:1px solid #eee;border-radius:6px;background:#fff">
+                            <!-- items will be rendered here -->
+                        </div>
+                        <input type="hidden" name="items" id="itemsInput" value="[]">
+                        <div style="margin-top:8px">Загальна сума: <strong id="total">0</strong> грн</div>
+
+                        <button class="btn" type="submit">Надіслати замовлення</button>
+                    </form>
+                </div>
+                <aside>
+                    <h3>Мої попередні замовлення</h3>
+                    {% if orders and orders|length > 0 %}
+                        <ul>
+                            {% for o in orders %}
+                                    <li style="margin-bottom:12px">
+                                    <strong>#{{ o.id }}</strong> — {{ o.items_text if o.items_text is defined else o.items }} — {{ o.total|int }} грн — {{ o.status or 'new' }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Ви ще не робили замовлень.</p>
+                    {% endif %}
+                </aside>
+            </section>
+    </main>
+
+        <!-- Футер -->
+    <footer>
+        <p>© 2025 Velvet Bite. Всі права захищені.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function(){
+            try{
+
+            const dishSelect = document.getElementById('dishSelect');
+            const dishes = {};
+            for (let i=0;i<dishSelect.options.length;i++){
+                const opt = dishSelect.options[i];
+                const val = opt.value;
+                if (!val) continue;
+                const id = parseInt(val);
+                let price = parseFloat(opt.getAttribute('data-price') || '0');
+                if (isNaN(price)){
+                    const m = opt.textContent.match(/([0-9]+(?:[.,][0-9]+)?)/);
+                    if (m) price = parseFloat(m[1].replace(',', '.')) || 0;
+                    else price = 0;
+                }
+
+                const name = opt.textContent.replace(/\s*—.*$/, '').trim();
+                dishes[id] = {id: id, name: name, price: price};
+            }
+            const dishQty = document.getElementById('dishQty');
+            const addBtn = document.getElementById('addDishBtn');
+            const itemsList = document.getElementById('itemsList');
+            const itemsInput = document.getElementById('itemsInput');
+            const totalEl = document.getElementById('total');
+
+            let items = [];
+
+            function renderItems(){
+                itemsList.innerHTML = '';
+                let total = 0;
+                items.forEach((it, idx) => {
+                    const d = dishes[it.dish_id];
+                    const name = d ? d.name : ('#' + it.dish_id);
+                    const price = d ? parseFloat(d.price) : 0;
+                    const row = document.createElement('div');
+                    row.style.display = 'flex';
+                    row.style.justifyContent = 'space-between';
+                    row.style.alignItems = 'center';
+                    row.style.padding = '6px 0';
+                    row.innerHTML = `<div>${name} — ${Math.round(price)} грн × <input type="number" value="${it.qty}" min="1" style="width:60px" data-idx="${idx}" class="qtyInput"></div><div><strong>${Math.round(price * it.qty)}</strong> грн <button data-idx="${idx}" class="removeBtn" style="margin-left:8px">✕</button></div>`;
+                    itemsList.appendChild(row);
+                });
+                items.forEach(it => {
+                    const price = (dishes[it.dish_id] ? parseFloat(dishes[it.dish_id].price) : 0);
+                    total += price * it.qty;
+                });
+                itemsInput.value = JSON.stringify(items);
+                totalEl.textContent = Math.round(total);
+
+                // attach handlers
+                itemsList.querySelectorAll('.removeBtn').forEach(btn => btn.addEventListener('click', function(){
+                    const idx = parseInt(this.getAttribute('data-idx'));
+                    items.splice(idx,1);
+                    renderItems();
+                }));
+                itemsList.querySelectorAll('.qtyInput').forEach(inp => inp.addEventListener('change', function(){
+                    const idx = parseInt(this.getAttribute('data-idx'));
+                    const v = parseInt(this.value) || 1;
+                    items[idx].qty = v;
+                    renderItems();
+                }));
+            }
+
+            addBtn.addEventListener('click', function(){
+                const did = parseInt(dishSelect.value);
+                const qty = parseInt(dishQty.value) || 1;
+                if (!did) return;
+
+                const existing = items.find(it => it.dish_id === did);
+                if (existing) {
+                    existing.qty += qty;
+                } else {
+                    items.push({dish_id: did, qty: qty});
+                }
+                renderItems();
+            });
+
+                {% if pre_dish %}
+                    try{
+                        const pd = {{ pre_dish|int }};
+                        const pq = {{ pre_qty|int if pre_qty else 1 }};
+                        if (pd) items.push({dish_id: pd, qty: pq});
+                    }catch(e){}
+                {% endif %}
+                renderItems();
+            }catch(err){
+                console.error('Order page script error:', err);
+            }
+        });
+    </script>
+</body>
+</html>

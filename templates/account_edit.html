@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редагувати профіль — Velvet Bite</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="left-group">
+                <div class="menu-toggle" id="menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <h1 class="logo"><span>Velvet</span> Bite</h1>
+            </div>
+            <h2 class="navigation">Редагувати профіль</h2>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="/">На сайт</a></li>
+                <li><a href="/account">Мій акаунт</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main style="max-width:700px;margin:24px auto">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, msg in messages %}
+                        <div class="flash-{{ category }}">{{ msg }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="post" action="" style="display:flex;flex-direction:column;gap:12px">
+            <label>Ім'я</label>
+            <input type="text" name="first_name" value="{{ account.first_name if account else '' }}">
+            <label>Прізвище</label>
+            <input type="text" name="last_name" value="{{ account.last_name if account else '' }}">
+            <label>Телефон</label>
+            <input type="text" name="phone" value="{{ account.phone if account else '' }}">
+            <label>Email</label>
+            <input type="email" name="email" value="{{ account.email if account else '' }}">
+            <label>Аватар (URL)</label>
+            <input type="text" name="avatar" value="{{ account.avatar if account and account.avatar else '' }}">
+            <label>Про мене (bio)</label>
+            <textarea name="bio" rows="4">{{ account.bio if account and account.bio else '' }}</textarea>
+            <div style="display:flex;gap:8px">
+                <button class="btn" type="submit">Зберегти</button>
+                <a class="btn" href="{{ url_for('account') }}">Скасувати</a>
+            </div>
+        </form>
+    </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

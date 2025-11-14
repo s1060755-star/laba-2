@@ -19,17 +19,24 @@
             </div>
 
             <h1 class="logo"><span>Velvet</span> Bite</h1>
-
+            
             <h2 class="navigation">Приєднуйся до нас</h2>
 
             <ul class="nav-links" id="nav-links">
                 <li><a href="/#home">Головна</a></li>
                 <li><a href="/#menu">Меню</a></li>
+                <li><a href="/favourite">Улюблені страви</a></li>
                 <li><a href="/#contact">Зв'язок</a></li>
                 <li><a href="/about">Про нас</a></li>
                 <li><a href="/service">Наші послуги</a></li>
                 <li><a href="/locate">Наші локації</a></li>
                 <li><a href="/work">Приєднуйтеся до нас</a></li>
+                <li class="navbar-account">
+                    <a href="/signUp" class="account-btn">
+                        <img src="/static/images/avatar.jpg" alt="Аватар користувача" class="avatar">
+                        <span class="account-text">Мій профіль</span>
+                    </a>
+                </li>
             </ul>
         </nav>
     </header>
@@ -45,22 +52,31 @@
             <img src="/static/images/peniwase.jpg" alt="Peniwise">
         </section>
         <!-- Форма -->
-        <section id="forma" class="contact-section">
-            <h2 class="contact-text">Надайте необхідні данні і ми з вами зв'яжемося</h2>
-            <form class="contact-form">
-                <input type="text" placeholder="Ваше ім’я" required>
-                <input type="phone" placeholder="Ваш номер телефону" required>
-                <input type="email" placeholder="Ваш email" required>
-                <textarea rows="profecion" placeholder="Напишіть бажану професію"></textarea>
-                <button type="submit">Надіслати</button>
-            </form>
-        </section>
+                <section id="forma" class="contact-section">
+                        <h2 class="contact-text">Надайте необхідні данні і ми з вами зв'яжемося</h2>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                <div class="flash-messages">
+                                    {% for category, msg in messages %}
+                                        <div class="flash-{{ category }}">{{ msg }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        <form class="contact-form" method="post" action="{{ url_for('add_work_route') }}">
+                                <input type="text" name="name" placeholder="Ваше ім’я" required>
+                                <input type="text" name="phone" placeholder="Ваш номер телефону">
+                                <input type="email" name="email" placeholder="Ваш email" required>
+                                <textarea name="profecy" rows="3" placeholder="Напишіть бажану професію"></textarea>
+                                <button type="submit">Надіслати</button>
+                        </form>
+                </section>
 
     <footer>
         <p>© 2025 Velvet Bite. Всі права захищені.</p>
     </footer>
 
-    <script src="static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
 
