@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "Laba-2 API Collection",
+    "_postman_id": "laba-2-api-collection",
+    "description": "Collection of API requests for the laba-2 project. Change `base_url` variable to point to your local server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:5000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get All Dishes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/dishes",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "dishes"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 200', function () {pm.response.to.have.status(200);});",
+              "pm.test('Response is an array', function () {var json = pm.response.json(); pm.expect(json).to.be.an('array');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Dish by ID (example id=1)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/dishes/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "dishes",
+            "1"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status is 200 or 404', function() {pm.expect(pm.response.code === 200 || pm.response.code === 404).to.be.true;});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create Dish",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Soup\",\n  \"price\": 50.0,\n  \"image\": \"\",\n  \"description\": \"Тестова страва\",\n  \"ingredients\": \"вода, сіль\",\n  \"calories\": 120\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": { "raw": "{{base_url}}/api/dishes", "host": ["{{base_url}}"], "path": ["api","dishes"] }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status code is 201', function () {pm.response.to.have.status(201);});",
+              "pm.test('Response has id', function() {var j = pm.response.json(); pm.expect(j).to.have.property('id');});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update Dish (example id=1)",
+      "request": {
+        "method": "PUT",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated name\",\n  \"price\": 55.0\n}", "options": { "raw": { "language": "json" } } },
+        "url": { "raw": "{{base_url}}/api/dishes/1", "host": ["{{base_url}}"], "path": ["api","dishes","1"] }
+      },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status is 200 or 404', function() {pm.expect(pm.response.code === 200 || pm.response.code === 404).to.be.true;});" ] } } ]
+    },
+    {
+      "name": "Delete Dish (example id=1)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": { "raw": "{{base_url}}/api/dishes/1", "host": ["{{base_url}}"], "path": ["api","dishes","1"] }
+      },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status is 200 or 404', function() {pm.expect(pm.response.code === 200 || pm.response.code === 404).to.be.true;});" ] } } ]
+    },
+    {
+      "name": "Get Orders",
+      "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api","orders"] } },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status 200', function(){pm.response.to.have.status(200);});","pm.test('Response is array', function(){var j=pm.response.json(); pm.expect(j).to.be.an('array');});" ] } } ]
+    },
+    {
+      "name": "Create Order",
+      "request": {
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"phone\": \"380123456789\",\n  \"address\": \"Test address\",\n  \"items\": [{\"dish_id\":1, \"qty\":1}]\n}", "options": { "raw": { "language": "json" } } },
+        "url": { "raw": "{{base_url}}/api/orders", "host": ["{{base_url}}"], "path": ["api","orders"] }
+      },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status 201 or 400', function(){pm.expect(pm.response.code === 201 || pm.response.code === 400).to.be.true;});" ] } } ]
+    },
+    {
+      "name": "Get Accounts",
+      "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/accounts", "host": ["{{base_url}}"], "path": ["api","accounts"] } },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status 200', function(){pm.response.to.have.status(200);});","pm.test('Response is array', function(){var j=pm.response.json(); pm.expect(j).to.be.an('array');});" ] } } ]
+    },
+    {
+      "name": "Get Favourites for Account (example id=1)",
+      "request": { "method": "GET", "header": [], "url": { "raw": "{{base_url}}/api/favourites/1", "host": ["{{base_url}}"], "path": ["api","favourites","1"] } },
+      "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [ "pm.test('Status 200', function(){pm.response.to.have.status(200);});" ] } } ]
+    }
+  ]
+}
