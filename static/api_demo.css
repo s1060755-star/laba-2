@@ -1,0 +1,19 @@
+:root{
+  --bg:#f7f9fc; --panel:#ffffff; --accent:#2b6cb0; --muted:#666;
+}
+body{font-family:Segoe UI, Roboto, Arial, sans-serif;background:var(--bg);color:#222;margin:0;padding:24px}
+.container{max-width:860px;margin:0 auto}
+h1{margin:0 0 12px}
+.panel{background:var(--panel);border-radius:8px;padding:16px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+label{display:block;margin:8px 0;font-size:14px}
+input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+.actions{margin-top:12px}
+button{background:var(--accent);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer}
+button:disabled{opacity:.6}
+#list{min-height:60px}
+.dish{padding:8px;border-bottom:1px solid #eee;display:flex;justify-content:space-between}
+.dish:last-child{border-bottom:none}
+.dish .name{font-weight:600}
+.msg{padding:10px;border-radius:6px;margin:8px 0}
+.msg.success{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
+.msg.error{background:#fff5f5;border:1px solid #fed7d7;color:#9b2c2c}

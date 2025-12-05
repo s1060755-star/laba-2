@@ -390,6 +390,12 @@ def signUp():
     return render_template('signUp.html')
 
 
+# Simple demo page served by the app to interact with the JSON API
+@app.route('/api_demo')
+def api_demo():
+    return render_template('api_demo.html')
+
+
 @app.route('/signUp/login', methods=['POST'])
 def sign_up_login():
     # create or fetch account, then set session and redirect to account page
