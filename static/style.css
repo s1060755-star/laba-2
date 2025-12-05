@@ -918,6 +918,13 @@ table tbody tr:nth-child(even) {
 .favourites-list .menu-item {
     padding: 20px;
     min-height: 340px;
+}
+
+/* Messages used by api_demo */
+#messages .msg{padding:12px;border-radius:8px;margin:10px 0;font-weight:600}
+#messages .msg.success{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
+#messages .msg.error{background:#fff5f5;border:1px solid #fed7d7;color:#9b2c2c}
+
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -943,3 +950,36 @@ table tbody tr:nth-child(even) {
    margin-top: 15px;
    margin-bottom: 15px;
 }
+
+/* API demo specific layout tweaks */
+.api-messages{position:fixed;top:82px;left:50%;transform:translateX(-50%);z-index:1200;width:min(920px,92%);pointer-events:none;text-align:center}
+.api-messages .msg{display:inline-block;pointer-events:auto;padding:12px 18px;border-radius:8px;margin:6px 0;font-weight:600;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+.api-messages .msg.success{background:#ffcc80;color:#3e2723;border:1px solid rgba(62,39,35,0.06)}
+.api-messages .msg.error{background:#ae5c5c;color:#ffcc80;border:1px solid rgba(0,0,0,0.06)}
+
+/* Demo list and dish item styles */
+.demo-list{display:flex;flex-direction:column;gap:12px;padding:0 20px}
+.demo-list .dish{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#ffffff;border-radius:12px;box-shadow:0 6px 16px rgba(75,46,43,0.04)}
+.demo-list .dish .left{display:flex;flex-direction:column;align-items:flex-start}
+.demo-list .dish .left{flex:1;min-width:0}
+.demo-list .dish .name{font-weight:700;color:#4B2E2B;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.demo-list .dish .muted{color:#6b4a46;font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Force a fixed width area for controls so name column is consistent */
+.demo-list .dish .controls{flex:0 0 180px;display:flex;justify-content:flex-end;align-items:center;gap:12px}
+.dish-btn{margin-left:0}
+.demo-list .dish .name{font-weight:700;color:#4B2E2B;margin-bottom:6px}
+.demo-list .dish .muted{color:#6b4a46;font-size:0.95rem}
+.demo-list .dish .controls{display:flex;align-items:center;gap:12px}
+.demo-list .dish .price{font-weight:700;color:#3e2723}
+
+/* Dish button hover/active using main theme */
+.dish-btn{background:#ffcc80;color:#3e2723;padding:8px 14px;border-radius:18px;border:none;cursor:pointer;transition:transform 0.12s ease, background 0.18s}
+.dish-btn:hover{background:#ffe0b2;transform:translateY(-3px)}
+.dish-btn:active{transform:translateY(0)}
+
+/* Demo form spacing */
+.demo-form{margin-top:28px;padding-bottom:60px}
+.demo-contact{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.demo-contact input{padding:12px;border-radius:10px;border:1px solid #e8d7d5}
+.form-actions{text-align:center;margin-top:6px}
