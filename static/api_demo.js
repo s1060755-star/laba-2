@@ -23,7 +23,33 @@ document.addEventListener('DOMContentLoaded', () => {
       data.forEach(d => {
         const el = document.createElement('div');
         el.className = 'dish';
-        el.innerHTML = `<div><div class="name">${escapeHtml(d.name||'')}</div><div class="muted">${escapeHtml(d.description||'')}</div></div><div class="price">${d.price!=null?d.price:'-'}</div>`;
+        const name = escapeHtml(d.name||'');
+        const desc = escapeHtml(d.description||'');
+        const price = d.price!=null?d.price:'-';
+        el.innerHTML = `<div><div class="name">${name}</div><div class="muted">${desc}</div></div><div class="controls"><div class="price">${price}</div><button class="dish-btn" data-id="${d.id}">Видалити</button></div>`;
+        // attach delete handler
+        const btn = el.querySelector('.dish-btn');
+        if(btn){
+          btn.addEventListener('click', async (ev)=>{
+            ev.preventDefault();
+            const id = btn.getAttribute('data-id');
+            if(!confirm('Видалити страву #' + id + '?')) return;
+            try{
+              const res = await fetch('/api/dishes/' + encodeURIComponent(id), { method: 'DELETE' });
+              if(res.ok){
+                showMessage('Страва видалена', 'success');
+                loadList();
+              } else {
+                let body = '';
+                try{ body = await res.json(); }catch(e){ body = await res.text(); }
+                showMessage('Помилка видалення: ' + (body.message || body.error || JSON.stringify(body)), 'error');
+              }
+            }catch(err){
+              showMessage('Помилка мережі при видаленні', 'error');
+              console.error(err);
+            }
+          });
+        }
         listEl.appendChild(el);
       });
     }catch(err){
