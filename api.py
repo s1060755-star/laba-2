@@ -5,6 +5,7 @@ from database import (
     get_all_accounts
 )
 import json
+import traceback
 
 
 def _row_to_dict(row):
@@ -225,25 +226,30 @@ def v2_update_dish(dish_id):
       404:
         description: Not found
     """
-    existing = get_dish_by_id(dish_id)
-    if not existing:
-        return _not_found()
     try:
-        data = request.get_json(force=True)
-    except Exception:
-        return _bad_request('invalid_json')
-    err = validate_dish_payload({**dict(existing), **(data or {})})
-    if err:
-        return _bad_request(err)
-    # merge
-    name = data.get('name') or existing['name']
-    price = float(data.get('price', existing['price']) or existing['price'])
-    image = data.get('image', existing.get('image',''))
-    description = data.get('description', existing.get('description',''))
-    ingredients = data.get('ingredients', existing.get('ingredients',''))
-    calories = data.get('calories', existing.get('calories'))
-    update_dish(dish_id, name, price, image, description, ingredients, calories)
-    return jsonify({'ok': True})
+        existing = get_dish_by_id(dish_id)
+        if not existing:
+            return _not_found()
+        try:
+            data = request.get_json(force=True)
+        except Exception:
+            return _bad_request('invalid_json')
+        err = validate_dish_payload({**dict(existing), **(data or {})})
+        if err:
+            return _bad_request(err)
+        # merge
+        name = data.get('name') or existing['name']
+        price = float(data.get('price', existing['price']) or existing['price'])
+        image = data.get('image', existing.get('image',''))
+        description = data.get('description', existing.get('description',''))
+        ingredients = data.get('ingredients', existing.get('ingredients',''))
+        calories = data.get('calories', existing.get('calories'))
+        update_dish(dish_id, name, price, image, description, ingredients, calories)
+        return jsonify({'ok': True})
+    except Exception as e:
+        print('v2_update_dish error:', e)
+        traceback.print_exc()
+        return jsonify({'error': 'server_error', 'message': str(e)}), 500
 
 
 @api_v2_bp.route('/dishes/<int:dish_id>', methods=['DELETE'])
@@ -403,182 +409,60 @@ def v2_get_accounts():
     """
     accounts = get_all_accounts()
     return jsonify([_row_to_dict(a) for a in accounts])
-from flask import Blueprint, jsonify, request
-from database import (
-    get_all_dish, get_dish_by_id, add_dish, update_dish, delete_dish,
-    get_all_orders, add_order, get_all_favourites, add_favourite, get_db,
-    get_all_accounts
-)
 
+
+# --- Legacy non-versioned API to support existing clients / Postman collection ---
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
-def _row_to_dict(row):
-    return dict(row) if row is not None else None
-
-
-@api_bp.errorhandler(400)
-def _handle_400(err):
-    return jsonify({'error': 'bad_request', 'message': str(err)}), 400
-
-
-@api_bp.errorhandler(404)
-def _handle_404(err):
-    return jsonify({'error': 'not_found', 'message': str(err)}), 404
-
-
-@api_bp.errorhandler(Exception)
-def _handle_exception(err):
-    return jsonify({'error': 'server_error', 'message': str(err)}), 500
-
-
-# --- Dishes ---
 @api_bp.route('/dishes', methods=['GET'])
-def api_get_all_dishes():
-    try:
-        dishes = get_all_dish()
-        return jsonify([_row_to_dict(d) for d in dishes])
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_get_all_dishes():
+    return v1_get_all_dishes()
 
 
 @api_bp.route('/dishes/<int:dish_id>', methods=['GET'])
-def api_get_dish(dish_id):
-    try:
-        d = get_dish_by_id(dish_id)
-        if not d:
-            return jsonify({'error': 'not_found'}), 404
-        return jsonify(_row_to_dict(d))
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_get_dish(dish_id):
+    return v1_get_dish(dish_id)
+
+
+@api_bp.route('/dish/<int:dish_id>', methods=['GET'])
+def legacy_get_dish_singular(dish_id):
+    # some clients may use /api/dish/:id (singular)
+    return v1_get_dish(dish_id)
 
 
 @api_bp.route('/dishes', methods=['POST'])
-def api_create_dish():
-    try:
-        data = request.get_json(force=True)
-        name = data.get('name')
-        price = data.get('price', 0)
-        image = data.get('image', '')
-        description = data.get('description', '')
-        ingredients = data.get('ingredients', '')
-        calories = data.get('calories', None)
-        if not name:
-            return jsonify({'error': 'name_required'}), 400
-        new_id = add_dish(name, float(price or 0), image, description, ingredients, calories)
-        return jsonify({'id': new_id}), 201
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_create_dish():
+    return v1_create_dish()
 
 
 @api_bp.route('/dishes/<int:dish_id>', methods=['PUT'])
-def api_update_dish(dish_id):
-    try:
-        data = request.get_json(force=True)
-        name = data.get('name', '')
-        price = data.get('price', 0)
-        image = data.get('image', '')
-        description = data.get('description', '')
-        ingredients = data.get('ingredients', '')
-        calories = data.get('calories', None)
-        existing = get_dish_by_id(dish_id)
-        if not existing:
-            return jsonify({'error': 'not_found'}), 404
-        update_dish(dish_id, name or existing['name'], float(price or existing['price']), image or existing.get('image',''), description or existing.get('description',''), ingredients or existing.get('ingredients',''), calories or existing.get('calories'))
-        return jsonify({'ok': True})
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_update_dish(dish_id):
+    return v1_create_dish() if request.method == 'POST' else (v1_get_dish(dish_id) if request.method == 'GET' else v1_get_dish(dish_id))
 
 
 @api_bp.route('/dishes/<int:dish_id>', methods=['DELETE'])
-def api_delete_dish(dish_id):
-    try:
-        existing = get_dish_by_id(dish_id)
-        if not existing:
-            return jsonify({'error': 'not_found'}), 404
-        delete_dish(dish_id)
-        return jsonify({'ok': True})
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_delete_dish(dish_id):
+    # call v2 delete for stronger behavior
+    return v2_delete_dish(dish_id)
 
 
-# --- Orders ---
 @api_bp.route('/orders', methods=['GET'])
-def api_get_orders():
-    try:
-        orders = get_all_orders()
-        return jsonify([_row_to_dict(o) for o in orders])
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_get_orders():
+    return v1_get_orders()
 
 
 @api_bp.route('/orders', methods=['POST'])
-def api_create_order():
-    try:
-        data = request.get_json(force=True)
-        name = data.get('name', 'Guest')
-        phone = data.get('phone', '')
-        address = data.get('address', '')
-        items = data.get('items', [])
-        if not address:
-            return jsonify({'error': 'address_required'}), 400
-        # compute total from DB to avoid trusting client
-        db = get_db()
-        cur = db.cursor()
-        total = 0.0
-        safe_items = []
-        for it in items:
-            try:
-                did = int(it.get('dish_id') if isinstance(it, dict) else it[0])
-                qty = int(it.get('qty', 1) if isinstance(it, dict) else (it[1] if len(it) > 1 else 1))
-            except Exception:
-                continue
-            cur.execute('SELECT price FROM dish WHERE id = ?', (did,))
-            row = cur.fetchone()
-            price_f = 0.0
-            if row:
-                try:
-                    price_val = row['price'] if 'price' in row.keys() else row[0]
-                    price_f = float(price_val)
-                except Exception:
-                    price_f = 0.0
-            total += price_f * qty
-            safe_items.append({'dish_id': did, 'qty': qty})
-        order_id = add_order(name, phone, address, safe_items, total)
-        return jsonify({'id': order_id, 'total': total}), 201
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_create_order():
+    return v1_create_order()
 
 
-# --- Favourites ---
-@api_bp.route('/favourites/<int:account_id>', methods=['GET'])
-def api_get_favourites(account_id):
-    try:
-        favs = get_all_favourites(account_id)
-        return jsonify([_row_to_dict(f) for f in favs])
-    except Exception as e:
-        return _handle_exception(e)
-
-
-@api_bp.route('/favourites', methods=['POST'])
-def api_add_favourite():
-    try:
-        data = request.get_json(force=True)
-        dish_id = data.get('dish_id')
-        account_id = data.get('account_id')
-        if not dish_id:
-            return jsonify({'error': 'dish_id_required'}), 400
-        new_id = add_favourite(int(dish_id), int(account_id) if account_id is not None else None)
-        return jsonify({'id': new_id}), 201
-    except Exception as e:
-        return _handle_exception(e)
-
-
-# --- Accounts ---
 @api_bp.route('/accounts', methods=['GET'])
-def api_get_accounts():
-    try:
-        accounts = get_all_accounts()
-        return jsonify([_row_to_dict(a) for a in accounts])
-    except Exception as e:
-        return _handle_exception(e)
+def legacy_get_accounts():
+    return v1_get_accounts()
+
+
+@api_bp.route('/favourites/<int:account_id>', methods=['GET'])
+def legacy_get_favourites(account_id):
+    return v1_get_favourites(account_id)
+
