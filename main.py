@@ -25,6 +25,27 @@ app.config['SESSION_COOKIE_SECURE'] = False
 # Ensure DB connection is closed after each request
 app.teardown_appcontext(close_db)
 
+# Initialize Swagger documentation (Flasgger)
+try:
+    from flasgger import Swagger
+    Swagger(app)
+except Exception:
+    # flasgger may not be installed in the environment; continue without swagger
+    pass
+
+# Register versioned API blueprints
+try:
+    from api import api_v1_bp, api_v2_bp
+    app.register_blueprint(api_v1_bp)
+    app.register_blueprint(api_v2_bp)
+except Exception:
+    # If import fails (e.g. missing dependencies), fallback to previous api if present
+    try:
+        from api import api_bp
+        app.register_blueprint(api_bp)
+    except Exception:
+        pass
+
 
 # Initialize DB and create a default admin once before handling requests
 # Use before_request with a one-time flag for compatibility with older Flask
