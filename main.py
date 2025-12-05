@@ -25,26 +25,41 @@ app.config['SESSION_COOKIE_SECURE'] = False
 # Ensure DB connection is closed after each request
 app.teardown_appcontext(close_db)
 
-# Initialize Swagger documentation (Flasgger)
+# Initialize Swagger documentation (Flasgger) and register blueprints (with debug output)
 try:
     from flasgger import Swagger
     Swagger(app)
-except Exception:
-    # flasgger may not be installed in the environment; continue without swagger
-    pass
+    print('flasgger: OK, Swagger UI should be available at /apidocs')
+except Exception as e:
+    print('flasgger: not available or failed to initialize:', e)
 
 # Register versioned API blueprints
 try:
     from api import api_v1_bp, api_v2_bp
     app.register_blueprint(api_v1_bp)
     app.register_blueprint(api_v2_bp)
-except Exception:
-    # If import fails (e.g. missing dependencies), fallback to previous api if present
+    # also register legacy non-versioned API if present
+    try:
+        from api import api_bp as api_legacy_bp
+        app.register_blueprint(api_legacy_bp)
+    except Exception:
+        pass
+except Exception as e:
+    print('Error importing versioned API blueprints:', e)
     try:
         from api import api_bp
         app.register_blueprint(api_bp)
-    except Exception:
-        pass
+    except Exception as e2:
+        print('Fallback legacy api import failed:', e2)
+
+# Print registered routes on startup for easier debugging
+try:
+    print('Registered routes:')
+    for r in app.url_map.iter_rules():
+        methods = ",".join(sorted(m for m in r.methods if m not in ("HEAD","OPTIONS")))
+        print(f"{methods:12}  {r.rule}  ->  {r.endpoint}")
+except Exception:
+    pass
 
 
 # Initialize DB and create a default admin once before handling requests
