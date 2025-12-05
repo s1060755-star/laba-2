@@ -22,11 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
       listEl.innerHTML = '';
       data.forEach(d => {
         const el = document.createElement('div');
-        el.className = 'dish';
-        const name = escapeHtml(d.name||'');
-        const desc = escapeHtml(d.description||'');
-        const price = d.price!=null?d.price:'-';
-        el.innerHTML = `<div><div class="name">${name}</div><div class="muted">${desc}</div></div><div class="controls"><div class="price">${price}</div><button class="dish-btn" data-id="${d.id}">Видалити</button></div>`;
+          el.className = 'dish';
+          const name = escapeHtml(d.name||'');
+          const desc = escapeHtml(d.description||'');
+          const price = d.price!=null?d.price:'-';
+          // left wrapper ensures consistent alignment for name/description
+          el.innerHTML = `<div class="left"><div class="name">${name}</div><div class="muted">${desc}</div></div><div class="controls"><div class="price">${price}</div><button class="dish-btn" data-id="${d.id}">Видалити</button></div>`;
         // attach delete handler
         const btn = el.querySelector('.dish-btn');
         if(btn){
