@@ -120,30 +120,30 @@ def validate_order_payload(data):
         return 'payload_must_be_object'
     if not data.get('address'):
         return 'address_required'
-    if 'items' in data and not isinstance(data['items'], list):
-        return 'items_must_be_array'
-    return None
-
-
-@api_v2_bp.route('/dishes', methods=['GET'])
-def v2_get_all_dishes():
-    """
-    Get list of dishes
-    ---
-    responses:
-      200:
-        description: List of dishes
-        schema:
-          type: array
-          items:
-            type: object
-    """
-    dishes = get_all_dish()
-    return jsonify([_row_to_dict(d) for d in dishes])
-
-
-@api_v2_bp.route('/dishes/<int:dish_id>', methods=['GET'])
-def v2_get_dish(dish_id):
+        try:
+                existing = get_dish_by_id(dish_id)
+                if not existing:
+                        return _not_found()
+                try:
+                        data = request.get_json(force=True)
+                except Exception:
+                        return _bad_request('invalid_json')
+                err = validate_dish_payload({**dict(existing), **(data or {})})
+                if err:
+                        return _bad_request(err)
+                # merge
+                name = data.get('name') or existing['name']
+                price = float(data.get('price', existing['price']) or existing['price'])
+                image = data.get('image', existing.get('image', ''))
+                description = data.get('description', existing.get('description', ''))
+                ingredients = data.get('ingredients', existing.get('ingredients', ''))
+                calories = data.get('calories', existing.get('calories'))
+                update_dish(dish_id, name, price, image, description, ingredients, calories)
+                return jsonify({'ok': True})
+        except Exception as e:
+                print('v2_update_dish error:', e)
+                traceback.print_exc()
+                return jsonify({'error': 'server_error', 'message': str(e)}), 500
     """
     Get dish by id
     ---
@@ -224,11 +224,11 @@ def v2_update_dish(dish_id):
       400:
         description: Validation error
       404:
-        description: Not found
-    """
-    try:
         existing = get_dish_by_id(dish_id)
         if not existing:
+                return _not_found()
+        delete_dish(dish_id)
+        return jsonify({'ok': True})
             return _not_found()
         try:
             data = request.get_json(force=True)
