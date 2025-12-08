@@ -1,4 +1,5 @@
 import sqlite3
+import os
 from flask import g
 try:
     from werkzeug.security import generate_password_hash, check_password_hash
@@ -27,7 +28,15 @@ import datetime
 def get_db():
     """Підключення до бази даних"""
     if 'db' not in g:
-        g.db = sqlite3.connect('my_database.db')
+        db_path = os.environ.get('DATABASE_PATH', 'my_database.db')
+        # Ensure directory exists for file path
+        try:
+            db_dir = os.path.dirname(db_path)
+            if db_dir:
+                os.makedirs(db_dir, exist_ok=True)
+        except Exception:
+            pass
+        g.db = sqlite3.connect(db_path)
         g.db.row_factory = sqlite3.Row  # Для отримання результатів у вигляді словника
     return g.db
 

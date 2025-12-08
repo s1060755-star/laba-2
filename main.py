@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask import jsonify
+import os
 import traceback
 from database import (
     get_all_dish, get_dish_by_id, get_all_work, get_all_feedback, get_all_accounts,
@@ -15,7 +16,9 @@ from database import (
 import json
 
 app = Flask(__name__)
-app.secret_key = 'dev-change-me-to-secure-key'
+# Configuration from environment
+app.secret_key = os.environ.get('FLASK_SECRET', 'dev-change-me-to-secure-key')
+app.config['ENV'] = os.environ.get('FLASK_ENV', app.config.get('ENV', 'production'))
 from datetime import timedelta
 app.permanent_session_lifetime = timedelta(days=30)
 # Session cookie settings to help persistence across reloads
@@ -75,6 +78,21 @@ def startup():
         except Exception:
             pass
         app.config['DB_INIT_DONE'] = True
+
+
+# Health check endpoint for container orchestration
+@app.route('/health')
+def health_check():
+    try:
+        # simple DB check
+        from database import get_db
+        db = get_db()
+        cursor = db.cursor()
+        cursor.execute('SELECT 1')
+        _ = cursor.fetchone()
+        return jsonify(status='ok'), 200
+    except Exception as e:
+        return jsonify(status='error', message=str(e)), 500
 
 # --- Головна сторінка ---
 @app.route('/')
@@ -677,4 +695,7 @@ def admin_logout():
 
 # --- Запуск програми ---
 if __name__ == '__main__':
-    app.run(debug=True)
+    host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
+    port = int(os.environ.get('FLASK_RUN_PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', '0') in ('1', 'true', 'True')
+    app.run(host=host, port=port, debug=debug)

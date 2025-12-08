@@ -164,6 +164,50 @@ git pull origin main
 ```json
   GET "http://127.0.0.1:5000/api/v2/dishes"
 ```
+
+---
+
+## Docker / Containerization
+
+This project includes a `Dockerfile` and `docker-compose.yml` for running the Flask app in containers.
+
+Quick start (recommended):
+
+1. Create the host data folder to persist the SQLite DB:
+
+```powershell
+mkdir -Force data
+```
+
+2. Build and run with docker-compose:
+
+```powershell
+docker-compose build --no-cache
+docker-compose up -d
+```
+
+3. Check logs and health:
+
+```powershell
+docker-compose logs -f web
+docker ps
+docker inspect --format='{{json .State.Health}}' $(docker ps -q -f name=laba-2_web_1)
+```
+
+Open the app at `http://localhost:5000` and Swagger UI (if available) at `http://localhost:5000/apidocs`.
+
+Configuration (environment variables):
+
+- `DATABASE_PATH` — SQLite file path inside container (default `/data/my_database.db`).
+- `FLASK_SECRET` — Flask secret key for sessions (default `dev-change-me-to-secure-key`).
+- `FLASK_DEBUG` — `1` to enable debug mode.
+
+Notes:
+- The `./data` host folder is mount-bound into the container to persist the SQLite file between restarts.
+- The compose healthcheck uses `GET /health` to verify the app can access the database.
+
+If you want smaller images or a multi-stage build that compiles wheels separately, I can adapt the `Dockerfile` to use a builder stage and strip unused packages.
+
 - **Приклад відповіді:**
 ```json
   {
