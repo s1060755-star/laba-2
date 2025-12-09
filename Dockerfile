@@ -1,9 +1,13 @@
 # Multi-purpose Dockerfile for the Flask app
 # Small, reproducible image using slim base
-FROM python:3.13-slim
+FROM python:3.13-slim AS base
+
+LABEL org.opencontainers.image.title="laba-2"
+LABEL org.opencontainers.image.description="Flask app for laba-2"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
@@ -19,7 +23,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application
 COPY . /app
 
-# Create a non-root user
+# Create a non-root user and fix permissions
 RUN groupadd -r app && useradd -r -g app app \
     && chown -R app:app /app
 
@@ -32,4 +36,7 @@ ENV DATABASE_PATH=/data/my_database.db \
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "3", "main:app"]
+# Lightweight healthcheck available at image level as well
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD curl -fsS http://localhost:5000/health || exit 1
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "main:app"]
