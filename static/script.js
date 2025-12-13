@@ -244,20 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /* Promo wheel: shows once per session (localStorage flag), draws a canvas wheel and spins to pick a discount */
   function createPromoModal(forceShow){
-    if(!forceShow) {
-      const lastShown = localStorage.getItem('promoLastShown');
-      const now = Date.now();
-      const oneDay = 24 * 60 * 60 * 1000; // 24 години в мілісекундах
-      
-      // Якщо вже показували менше ніж 24 години тому - не показувати
-      if(lastShown && (now - parseInt(lastShown)) < oneDay) {
-        console.log('Колесо вже показувалось менше ніж 24 години тому');
-        return; // Не показувати
-      }
-    }catch(e){ 
-      // Якщо localStorage недоступний, показуємо все одно
-      console.error('Помилка доступу до localStorage:', e);
-    }
+    try{
+      // only auto-show if user hasn't spun before (persist across sessions)
+      if(!forceShow && window.localStorage && localStorage.getItem('promoSpun')) return; // already spun
+    }catch(e){ }
 
     const discounts = [5,10,15,20,25,50];
     const colors = ['#f9c2c2','#ffd9a8','#d8f7d6','#d0e9ff','#e6d1ff','#ffd7e6'];
