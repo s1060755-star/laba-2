@@ -237,6 +237,10 @@ def init_db():
         cursor.execute("ALTER TABLE orders ADD COLUMN status TEXT")
     except Exception:
         pass
+    try:
+        cursor.execute("ALTER TABLE orders ADD COLUMN discount REAL")
+    except Exception:
+        pass
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS admin_accounts (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -317,14 +321,14 @@ def get_orders_by_phone(phone):
 
 
 
-def add_order(customer_name, phone, address, items, total):
+def add_order(customer_name, phone, address, items, total, discount=0.0):
     db = get_db()
     cursor = db.cursor()
     items_json = json.dumps(items)
     created = datetime.datetime.utcnow().isoformat()
     cursor.execute(
-        'INSERT INTO orders (customer_name, phone, address, items, total, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-        (customer_name, phone, address, items_json, total, created)
+        'INSERT INTO orders (customer_name, phone, address, items, total, created_at, discount) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        (customer_name, phone, address, items_json, total, created, float(discount or 0.0))
     )
     db.commit()
     return cursor.lastrowid

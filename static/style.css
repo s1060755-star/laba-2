@@ -309,6 +309,127 @@ body {
     font-style: normal;
 }
 
+/* NewYear: keep normal site look, add garlands above dish cards, unify buttons */
+html.newyear body{
+    background-color: #FFF5F2; /* match simple theme background */
+    color: #4B2E2B;
+}
+
+/* Keep menu-item base styling (same as default) but add garland decoration */
+html.newyear .menu-item{
+    background: #FFF5F2;
+    color: #4B2E2B;
+    position: relative;
+    overflow: visible;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Garland string above each card */
+html.newyear .menu-item::before{
+    /* curved garland string using inline SVG for smooth curve (static) */
+    content: '';
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: -34px;
+    height: 48px;
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 100% 48px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 48' preserveAspectRatio='none'><path d='M0 34 C90 6 170 62 300 34 C430 6 510 62 600 34' stroke='%23214b2a' stroke-width='4' fill='none' stroke-linecap='round' stroke-linejoin='round' opacity='0.95'/></svg>");
+    z-index: 4; /* above bulbs so bulbs appear hanging under the string */
+    pointer-events: none;
+}
+
+html.newyear .menu-item::after{
+        /* bulbs rendered as multiple radial-gradients across the width (static, twinkle only) */
+        content: '';
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        top: -10px; /* place bulbs under the string curve */
+        height: 20px;
+        z-index: 2; /* below the string so they look hung under it */
+        pointer-events: none;
+        background-repeat: no-repeat;
+        background-image:
+            radial-gradient(circle at 4% 55%, #ff6b6b 6px, transparent 7px),
+            radial-gradient(circle at 18% 45%, #ffd166 6px, transparent 7px),
+            radial-gradient(circle at 32% 55%, #81f79f 6px, transparent 7px),
+            radial-gradient(circle at 48% 45%, #9fd1ff 6px, transparent 7px),
+            radial-gradient(circle at 62% 55%, #d6a3ff 6px, transparent 7px),
+            radial-gradient(circle at 76% 45%, #ffd166 6px, transparent 7px),
+            radial-gradient(circle at 90% 55%, #ff6b6b 6px, transparent 7px);
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18));
+        animation: bulb-twinkle 2.8s ease-in-out infinite;
+}
+
+@keyframes bulb-twinkle{
+    0%{ opacity:0.78; box-shadow: 0 2px 6px rgba(0,0,0,0.18) }
+    50%{ opacity:1; box-shadow: 0 6px 18px rgba(255,220,120,0.35) }
+    100%{ opacity:0.82; box-shadow: 0 2px 6px rgba(0,0,0,0.18) }
+}
+
+@keyframes garland-sway{
+    0%{ transform: translateY(0) rotate(-1deg); }
+    50%{ transform: translateY(2px) rotate(1deg); }
+    100%{ transform: translateY(0) rotate(-1deg); }
+}
+
+/* Snowflakes container and flake style (created by JS) */
+.snow-container{ position:fixed; left:0; top:0; width:100%; height:100%; pointer-events:none; z-index:1001; overflow:hidden }
+.snow-container .flake{ position:absolute; color:#b8ccf9; font-size:14px; will-change:transform,opacity; text-shadow:0 1px 2px rgba(0,0,0,0.2); opacity:0.9 }
+
+/* Improve contrast of snowflakes on light backgrounds: subtle glow + drop-shadow */
+.snow-container .flake{
+    text-shadow: 0 1px 0 rgba(255,255,255,0.25), 0 2px 6px rgba(0,0,0,0.18);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.18));
+}
+
+/* Per-light twinkle styles (JS will inject .light elements) */
+html.newyear .menu-item .garland-lights{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -18px;
+    height: 28px;
+    pointer-events: none;
+    z-index: 2;
+}
+html.newyear .menu-item .garland-lights .light{
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transform: translateY(8px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.18);
+    opacity: 0.85;
+    animation: light-twinkle 2.6s ease-in-out infinite;
+}
+
+@keyframes light-twinkle{
+    0%{ opacity:0.6; box-shadow: 0 2px 6px rgba(0,0,0,0.18) }
+    45%{ opacity:1; box-shadow: 0 8px 26px rgba(255,220,120,0.35) }
+    100%{ opacity:0.7; box-shadow: 0 2px 6px rgba(0,0,0,0.18) }
+}
+
+@media (max-width:700px){
+    html.newyear .menu-item .garland-lights{ display:none }
+}
+
+@keyframes fall-random{
+    0%{ transform: translateY(-10vh) translateX(0) rotate(0deg); opacity:0 }
+    10%{ opacity:1 }
+    30%{ transform: translateY(25vh) translateX(calc(var(--dx) * -0.6)) rotate(90deg) }
+    60%{ transform: translateY(65vh) translateX(calc(var(--dx) * 0.5)) rotate(200deg) }
+    100%{ transform: translateY(110vh) translateX(calc(var(--dx) * -0.2)) rotate(360deg); opacity:0.95 }
+}
+
+/* reduce visual clutter on small screens */
+@media (max-width:700px){
+    .menu-item::before, .menu-item::after{ display:none }
+}
+
 /* Контакти */
 .contact-section {
     text-align: center;
@@ -334,11 +455,91 @@ body {
     gap: 15px;
 }
 
+/* Form controls - refined appearance */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="search"],
+textarea,
+select,
+.contact-form input[type="text"],
+.contact-form input[type="email"],
+.contact-form input[type="tel"],
+.contact-form textarea,
+.contact-form select {
+    background: #ffffff;
+    border: 1px solid rgba(75,46,43,0.12);
+    padding: 12px 14px;
+    border-radius: 12px;
+    color: #4B2E2B;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transition: box-shadow 0.18s ease, border-color 0.12s ease, transform 0.08s ease;
+    font-size: 15px;
+    min-height: 44px;
+    outline: none;
+}
+
+textarea{ min-height: 120px; resize: vertical; }
+
+/* Placeholder color */
+input::placeholder, textarea::placeholder { color: rgba(75,46,43,0.45); }
+
+/* Focus state */
+input:focus, textarea:focus, select:focus {
+    border-color: rgba(174,92,92,0.9);
+    box-shadow: 0 10px 30px rgba(174,92,92,0.08);
+    transform: translateY(-1px);
+}
+
+/* Better select appearance with custom arrow */
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='%234B2E2B' d='M4 6l4 4 4-4z'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+.contact-form button{
+    background: #3e2723;
+    color: #ffcc80;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.contact-form button:hover{ background:#5a3a36 }
+
 .contact-form input,
 .contact-form textarea {
     padding: 15px;
     border: 1px solid #ccc;
     border-radius: 10px;
+}
+
+/* Stronger overrides for the contact section's feedback field to ensure visibility */
+.contact-section .contact-form textarea,
+.contact-section .contact-form input[type="text"],
+.contact-section .contact-form input[type="email"]{
+    background: #ffffff;
+    border: 1px solid rgba(62,39,35,0.14);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+    color: #4B2E2B;
+    font-size: 15px;
+}
+.contact-section .contact-form textarea{
+    min-height: 140px;
+}
+.contact-section .contact-form button{
+    background: #3e2723;
+    color: #ffcc80;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
 }
 
 .contact-form button {
@@ -925,11 +1126,6 @@ table tbody tr:nth-child(even) {
 #messages .msg.success{background:#e6fffa;border:1px solid #b2f5ea;color:#065f46}
 #messages .msg.error{background:#fff5f5;border:1px solid #fed7d7;color:#9b2c2c}
 
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: stretch;
-}
 .favourites-list .menu-item img {
     height: 240px;
     object-fit: cover;
@@ -983,3 +1179,150 @@ table tbody tr:nth-child(even) {
 .demo-contact{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
 .demo-contact input{padding:12px;border-radius:10px;border:1px solid #e8d7d5}
 .form-actions{text-align:center;margin-top:6px}
+
+/* Theme toggle button (visible) */
+.theme-toggle{
+    position:fixed;
+    right:18px;
+    top:16px;
+    width:66px;
+    height:36px;
+    display:inline-block;
+    padding:0 8px;
+    background: #ffcc80;
+    border-radius:999px;
+    border:1px solid rgba(0,0,0,0.06);
+    color:#3e2723;
+    font-weight:700;
+    cursor:pointer;
+    z-index:10050;
+    box-shadow:0 8px 20px rgba(0,0,0,0.12);
+    position:fixed;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:6px;
+    padding-left:8px;
+    transition: background .25s ease;
+    overflow:hidden;
+    left: auto;
+}
+.theme-toggle .theme-icon{ font-size:16px; margin-left:2px }
+.theme-toggle .theme-label{ display:none }
+/* handle */
+.theme-toggle::after{
+    content:'';
+    position:absolute;
+    left:6px;
+    top:6px;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 2px 6px rgba(0,0,0,0.18);
+    transition:left .22s ease, background .22s ease, transform .22s ease;
+}
+.theme-toggle[aria-pressed="true"]{
+    background: #6dd3ff;
+}
+.theme-toggle[aria-pressed="true"]::after{
+    left: calc(100% - 6px - 24px);
+    background: #fff8cc;
+    transform: translateY(-1px);
+}
+
+/* Ensure navbar reserves space so toggle doesn't cover title */
+.navbar{ padding-right:140px }
+.navigation{ margin-right:8px }
+
+/* Decorative trees removed */
+
+/* New Year theme */
+html.newyear body{
+    background-color: #FFF5F2; 
+    color:#4B2E2B;
+}
+/* NewYear color variables */
+html.newyear{ --ny-green: #0b3d18; --ny-deep: #062913; --ny-red: #b22222; --ny-gold: #ffd27a; }
+
+/* Navbar: revert to normal theme look (keep site consistent) */
+html.newyear .navbar{
+    background: #2C1B18;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+html.newyear .logo{ color: #ffcc80; }
+html.newyear .logo span{ color: #8B0000; }
+
+/* Side nav: revert to normal theme */
+html.newyear .nav-links{ background: #4B2E2B; }
+html.newyear .nav-links a{ color: #ffcc80; }
+html.newyear .nav-links a:hover{ color: #ffe0b2; }
+
+/* Burger menu lines: keep improved visibility but match normal palette */
+html.newyear .menu-toggle span{
+    background: #ffcc80;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+html.newyear .menu-toggle.active span:nth-child(1){ transform: rotate(45deg) translate(5px,5px); }
+html.newyear .menu-toggle.active span:nth-child(3){ transform: rotate(-45deg) translate(7px,-7px); }
+
+/* Card styles: keep base card appearance from normal theme */
+html.newyear .menu-item{ background: #FFF5F2; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: none; }
+html.newyear .menu-item h3{ color: #4B2E2B; }
+html.newyear .menu-item p{ color: #6b4a46; }
+html.newyear .menu-item span{ color: #ffcc80; }
+
+html.newyear .menu-item:hover{ transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+
+/* Buttons and forms */
+html.newyear .btn{ background: var(--ny-red); color: #2b1208; box-shadow: 0 10px 24px rgba(0,0,0,0.45); }
+html.newyear .btn:hover{ transform: translateY(-2px); }
+
+html.newyear input, html.newyear textarea{
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: #fff;
+}
+
+/* Theme toggle appearance (no emoji) */
+html.newyear .theme-toggle{ background: var(--ny-red); color:#fff; border: none; }
+
+
+/* Removed dotted overlay (keeps snowflakes generated by JS) */
+
+/* Promo modal / wheel of fortune */
+.promo-overlay{
+    position:fixed;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:20000;
+}
+.promo-modal{
+    background:#fff;padding:18px;border-radius:12px;max-width:520px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,0.45);text-align:center;color:#4B2E2B;
+}
+.promo-modal h3{margin:6px 0 12px;font-size:20px}
+.promo-wheel-wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+.promo-wheel{width:320px;height:320px;border-radius:50%;overflow:visible;transition:transform 5s cubic-bezier(.2,.9,.2,1);will-change:transform}
+.wheel-frame{position:relative;display:inline-block}
+.spin-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:72px;height:72px;border-radius:50%;background:#ffcc80;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(0,0,0,0.12);z-index:3}
+.spin-center .spin-text{color:#3e2723;font-weight:700}
+.spin-center::after{content:"";position:absolute;left:50%;transform:translateX(-50%);bottom:-18px;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:24px solid #ffcc80;border-radius:3px}
+.promo-spin-btn{background:#ffcc80;color:#3e2723;padding:10px 18px;border-radius:28px;border:none;font-weight:700;cursor:pointer}
+.promo-close{background:transparent;border:none;color:#6b4a46;cursor:pointer;text-decoration:underline;margin-top:6px}
+.promo-result{margin-top:10px;font-weight:700;color:#b22222}
+
+/* small badge showing active discount */
+.promo-badge{position:fixed;right:18px;top:62px;background:#ffcc80;color:#3e2723;padding:8px 12px;border-radius:20px;z-index:15000;box-shadow:0 8px 20px rgba(0,0,0,0.12);font-weight:700}
+
+@media (max-width:420px){
+    .promo-wheel{width:240px;height:240px}
+}
+
+/* Force buttons to theme yellow and dark text for legibility */
+button, .btn, .dish-btn, .cart-btn, .account-btn, .signUp-form-in a, .signUp-btn-account, .contact-form button, .promo-spin-btn {
+    background: #ffcc80 !important;
+    color: #3e2723 !important;
+    border: none !important;
+}
+
+/* Ensure order page text is dark (not white) so totals and items are readable) */
+#orderForm, #orderForm * , #itemsList, #itemsList * , #total, #discountInfo {
+    color: #4B2E2B !important;
+}

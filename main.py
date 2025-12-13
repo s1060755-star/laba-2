@@ -659,8 +659,23 @@ def create_order():
             total += price_f * qty
             safe_items.append({'dish_id': did, 'qty': qty})
 
-        add_order(name, phone, address, safe_items, total)
-        flash('Замовлення створено. Дякуємо!', 'success')
+        # apply optional discount from form (percentage)
+        try:
+            discount = float(request.form.get('discount', 0) or 0)
+        except Exception:
+            discount = 0.0
+        discount = max(0.0, min(100.0, discount))
+        discounted_total = round(total * (1.0 - discount/100.0), 2)
+        add_order(name, phone, address, safe_items, discounted_total, discount)
+        if discount and discount > 0:
+            flash(f'Замовлення створено. Знижка {discount}% застосована. Платіж: {discounted_total} грн.', 'success')
+        else:
+            flash('Замовлення створено. Дякуємо!', 'success')
+        try:
+            # do nothing here — discount already applied in add_order call if provided
+            pass
+        except Exception:
+            pass
     except Exception as e:
         tb = traceback.format_exc()
         print(tb)

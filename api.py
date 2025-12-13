@@ -74,8 +74,14 @@ def v1_create_order():
                 price_f = 0.0
         total += price_f * qty
         safe_items.append({'dish_id': did, 'qty': qty})
-    order_id = add_order(data.get('name','Guest'), data.get('phone',''), address, safe_items, total)
-    return jsonify({'id': order_id, 'total': total}), 201
+    # support optional discount percent in payload
+    try:
+        discount = float(data.get('discount', 0) or 0)
+    except Exception:
+        discount = 0.0
+    discounted_total = round(total * (1.0 - max(0, min(100, discount)) / 100.0), 2)
+    order_id = add_order(data.get('name','Guest'), data.get('phone',''), address, safe_items, discounted_total, discount)
+    return jsonify({'id': order_id, 'total': discounted_total, 'discount': discount}), 201
 
 
 @api_v1_bp.route('/favourites/<int:account_id>', methods=['GET'])
@@ -344,8 +350,14 @@ def v2_create_order():
                 price_f = 0.0
         total += price_f * qty
         safe_items.append({'dish_id': did, 'qty': qty})
-    order_id = add_order(data.get('name', 'Guest'), data.get('phone', ''), data.get('address', ''), safe_items, total)
-    return jsonify({'id': order_id, 'total': total}), 201
+    try:
+        discount = float(data.get('discount', 0) or 0)
+    except Exception:
+        discount = 0.0
+    discount = max(0.0, min(100.0, discount))
+    discounted_total = round(total * (1.0 - discount/100.0), 2)
+    order_id = add_order(data.get('name', 'Guest'), data.get('phone', ''), data.get('address', ''), safe_items, discounted_total, discount)
+    return jsonify({'id': order_id, 'total': discounted_total, 'discount': discount}), 201
 
 
 @api_v2_bp.route('/favourites/<int:account_id>', methods=['GET'])

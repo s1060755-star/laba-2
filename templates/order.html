@@ -91,6 +91,9 @@
                             <!-- items will be rendered here -->
                         </div>
                         <input type="hidden" name="items" id="itemsInput" value="[]">
+                        <input type="hidden" name="discount" id="discountInput" value="0">
+                        <div id="discountInfo" style="margin-top:6px;color:#4B2E2B;font-weight:700"></div>
+                        <!-- discount debug UI removed per request -->
                         <div style="margin-top:8px">Загальна сума: <strong id="total">0</strong> грн</div>
 
                         <button class="btn" type="submit">Надіслати замовлення</button>
@@ -169,7 +172,29 @@
                     total += price * it.qty;
                 });
                 itemsInput.value = JSON.stringify(items);
-                totalEl.textContent = Math.round(total);
+                // apply any active discount stored in localStorage (robust parse)
+                let discount = 0;
+                try{
+                    const raw = localStorage.getItem('activeDiscount') || '0';
+                    const m = String(raw).match(/-?\d+(?:\.\d+)?/);
+                    discount = m ? parseFloat(m[0]) : 0;
+                }catch(e){ discount = 0 }
+                const totalRounded = Math.round(total);
+                if(discount && discount > 0){
+                    const discounted = Math.round((total * (1 - discount/100)) * 100)/100;
+                    totalEl.textContent = discounted;
+                    const infoEl = document.getElementById('discountInfo');
+                    const discInput = document.getElementById('discountInput');
+                    if(infoEl) infoEl.textContent = `Знижка ${discount}% застосована — початкова сума ${totalRounded} грн, платіж: ${discounted} грн`;
+                    if(discInput) discInput.value = String(discount);
+                } else {
+                    totalEl.textContent = totalRounded;
+                    const infoEl = document.getElementById('discountInfo'); if(infoEl) infoEl.textContent = '';
+                    const discInput = document.getElementById('discountInput'); if(discInput) discInput.value = '0';
+                }
+
+                // update debug UI and ensure discount input is synced
+                try{ if(typeof applyDiscountUI === 'function') applyDiscountUI(); }catch(e){}
 
                 // attach handlers
                 itemsList.querySelectorAll('.removeBtn').forEach(btn => btn.addEventListener('click', function(){
@@ -185,6 +210,9 @@
                 }));
             }
 
+            // expose for external refresh (global script may call window.renderItems())
+            try{ window.renderItems = renderItems; }catch(e){}
+
             addBtn.addEventListener('click', function(){
                 const did = parseInt(dishSelect.value);
                 const qty = parseInt(dishQty.value) || 1;
@@ -197,7 +225,34 @@
                     items.push({dish_id: did, qty: qty});
                 }
                 renderItems();
+                try{ if(typeof applyDiscountUI === 'function') applyDiscountUI(); }catch(e){}
             });
+
+            // apply discount UI helper: reads localStorage and updates debug, discountInput and discountInfo
+            function applyDiscountUI(){
+                try{
+                    const raw = localStorage.getItem('activeDiscount') || '0';
+                    const m = String(raw).match(/-?\d+(?:\.\d+)?/);
+                    const disc = m ? parseFloat(m[0]) : 0;
+                    const cur = document.getElementById('discountCurrent');
+                    const discInput = document.getElementById('discountInput');
+                    const infoEl = document.getElementById('discountInfo');
+                    if(cur) cur.textContent = `Поточна знижка: ${disc > 0 ? disc + '%' : '—'}`;
+                    if(discInput) discInput.value = String(disc > 0 ? disc : 0);
+                    if(infoEl && disc > 0){
+                        // keep existing info text if renderItems already set it, otherwise set minimal text
+                        if(!infoEl.textContent || infoEl.textContent.indexOf('застосована') === -1) infoEl.textContent = `Знижка ${disc}% застосована`;
+                    }
+                }catch(e){ }
+            }
+
+            // wire apply button for manual testing
+            try{
+                const applyBtn = document.getElementById('applyDiscountBtn');
+                if(applyBtn) applyBtn.addEventListener('click', function(){
+                    try{ applyDiscountUI(); renderItems(); }catch(e){}
+                });
+            }catch(e){}
 
                 {% if pre_dish %}
                     try{
