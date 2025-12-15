@@ -9,7 +9,38 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.env
+
+# Environment files (keep .env.example in repo)
+.env
+.env.local
+.env.*.local
+*.db
+my_database.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
