@@ -681,10 +681,10 @@ git pull origin main
 
   ### Огляд архітектури
   Frontend → REST API → База даних
-  ![ASCII](Screenshots/ASCII.png)
+  ![ASCII](docs\Screenshots/ASCII.png)
 
   ### Структура архітектури
-  ![Database Structure](Screenshots/Database_Structure.png)
+  ![Database Structure](docs\Screenshots/Database_Structure.png)
 
   ## Опис всього реалізованого функціоналу
   1) Головне меню: 
@@ -719,13 +719,13 @@ git pull origin main
   ## Опис нових доданих функцій
   1. ### Колесо фортуни зі знижками
 Додано колесо фортуни при вході на сторінку головного меню, користувач може нажати кнопку "Крутити" після чого йому випаде одна із знижок, яка автоматично застосовується до оформлення замовлень.
-![NewFunction1_1](Screenshots/NewFunction1_1.png)
-![NewFunction1_2](Screenshots/NewFunction1_2.png) 
-![NewFunction1_3](Screenshots/NewFunction1_3.png) 
+![NewFunction1_1](docs\Screenshots/NewFunction1_1.png)
+![NewFunction1_2](docs\Screenshots/NewFunction1_2.png) 
+![NewFunction1_3](docs\Screenshots/NewFunction1_3.png) 
 2. ### Можливість включення сніжинок
 Додано перемикач при переключанні якого на сторінках застосовується візуальний еффект падання сніжинок (P.S. для новорнічого настрою)
-![NewFunction2_1](Screenshots/NewFunction2_1.png)
-![NewFunction2_2](Screenshots/NewFunction2_2.png)
+![NewFunction2_1](docs\Screenshots/NewFunction2_1.png)
+![NewFunction2_2](docs\Screenshots/NewFunction2_2.png)
   ## Вирішення типових проблем
 Проблема: Сайт не завантажується
 Рішення: Перевірити підключення до інтернету та оновити сторінку браузера. У разі повторення проблеми спробувати відкрити сайт пізніше.
@@ -749,10 +749,10 @@ git pull origin main
 
 ### Огляд архітектури
 Frontend → REST API → База даних
-![ASCII](Screenshots/ASCII.png)
+![ASCII](docs\Screenshots/ASCII.png)
 
 ### Структура архітектури
-![Database Structure](Screenshots/Database_Structure.png)
+![Database Structure](docs\Screenshots/Database_Structure.png)
 
 # Опис всіх endpoints 
 ### 1. [Get All Dishes]
@@ -876,9 +876,6 @@ Frontend → REST API → База даних
   "ok": true
 }
 ```
-- **Скріншот з Postman (або Swagger):**
-![Delete dish](ScreenshotsEndpoints/DeleteDish.png)
-
 ### 6. [Get Orders]
 - **URL:** `/api/v2/orders`
 - **Метод:** `GET`
@@ -931,8 +928,6 @@ Frontend → REST API → База даних
   "total": 0
 }
 ```
-- **Скріншот з Postman (або Swagger):**
-![Create order](ScreenshotsEndpoints/CreateOrder.png)
 
 ### 8. [Get Accounts]
 - **URL:** `/api/v2/accounts`
@@ -984,30 +979,30 @@ Frontend → REST API → База даних
 ### Інструкції з використанням основних функцій
 1. # Створення замовлень
 Перший спосіб: На головній сторінці нажати на кнопку "Створити замовлення" після того як користувача перенесло на сторінку оформлення замовлення потрібно заповнити форму та нажати кнопку "Надіслати замовлення".
-![Instruction1_1](Screenshots/Instruction1_1.png)
-![Instruction1_2](Screenshots/Instruction1_2.png)
+![Instruction1_1](docs\Screenshots/Instruction1_1.png)
+![Instruction1_2](docs\Screenshots/Instruction1_2.png)
 Другий спосіб: На головній сторінці обрати страву натиснувший на неї, після того як користувача перенесло на сторінку страви потрібно нажати на кнопку "Додати до замовлення", після перенесення на сторінку оформлення замовлення потрібно заповнити форму та нажати кнопку "Надіслати замовлення".
-![Instruction2_1](Screenshots/Instruction2_1.png)
-![Instruction2_2](Screenshots/Instruction2_2.png)
-![Instruction2_3](Screenshots/Instruction2_3.png)
+![Instruction2_1](docs\Screenshots/Instruction2_1.png)
+![Instruction2_2](docs\Screenshots/Instruction2_2.png)
+![Instruction2_3](docs\Screenshots/Instruction2_3.png)
 2. # Можливість зворотного зв`язку
 На головній сторінці прокрутити до самого низу, заповнити форму і нажати кнопку "Надіслати".
-![insturction1_1](Screenshots/insturction1_1.png)
+![insturction1_1](docs\Screenshots/insturction1_1.png)
 3. # Адмін панель
 Для переходу на адмін панель потрібно написати замість адреси сторінки "admin" -> http://127.0.0.1:5000/admin , після цього користувача перекидає на сторінку входу в адмін панель, ім'я користувача має бути "admin", пароль "11111", при натисненні кнопки "Увійти" користувача перенесе на саму сторінку адмін панелі, де він зможе: керувати стравами, керувати замовлення, переглядати відгуки та заявки на роботу, переглядати аккаунти та за потреби видаляти їх.
-![admin_inctruction1](Screenshots/admin_inctruction1.png)
-![admin_inctruction2](Screenshots/admin_inctruction2.png)
+![admin_inctruction1](docs\Screenshots/admin_inctruction1.png)
+![admin_inctruction2](docs\Screenshots/admin_inctruction2.png)
 
 ## Нові додані функції
 1. # Колесо фортуни зі знижками
 Додано колесо фортуни при вході на сторінку головного меню, користувач може нажати кнопку "Крутити" після чого йому випаде одна із знижок, яка автоматично застосовується до оформлення замовлень.
-![NewFunction1_1](Screenshots/NewFunction1_1.png)
-![NewFunction1_2](Screenshots/NewFunction1_2.png) 
-![NewFunction1_3](Screenshots/NewFunction1_3.png) 
+![NewFunction1_1](docs\Screenshots/NewFunction1_1.png)
+![NewFunction1_2](docs\Screenshots/NewFunction1_2.png) 
+![NewFunction1_3](docs\Screenshots/NewFunction1_3.png) 
 2. # Можливість включення сніжинок
 Додано перемикач при переключанні якого на сторінках застосовується візуальний еффект падання сніжинок (P.S. для новорнічого настрою)
-![NewFunction2_1](Screenshots/NewFunction2_1.png)
-![NewFunction2_2](Screenshots/NewFunction2_2.png)
+![NewFunction2_1](docs\Screenshots/NewFunction2_1.png)
+![NewFunction2_2](docs\Screenshots/NewFunction2_2.png)
 
 ## Вирішення типових проблем
 Проблема: Сайт не завантажується
