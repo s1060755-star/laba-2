@@ -2,6 +2,12 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask import jsonify
 import os
 import traceback
+import sys
+import secrets
+import hashlib
+from functools import wraps
+from datetime import datetime, timedelta
+from collections import defaultdict
 from database import (
     get_all_dish, get_dish_by_id, get_all_work, get_all_feedback, get_all_accounts,
     add_dish, add_work, delete_dish, delete_accounts, get_db, add_account, add_feedback,
@@ -16,15 +22,129 @@ from database import (
 import json
 
 app = Flask(__name__)
+
+# Compression для зменшення розміру відповідей
+try:
+    from flask_compress import Compress
+    Compress(app)
+    print('Flask-Compress: Enabled')
+except ImportError:
+    print('Flask-Compress: Not available (install with: pip install flask-compress)')
+
+# Simple in-memory cache для статичних даних
+_cache = {}
+_cache_timestamps = {}
+CACHE_TTL = 300  # 5 хвилин
+
+# Simple rate limiting
+_rate_limit_store = defaultdict(list)
+RATE_LIMIT_REQUESTS = 100  # Максимум запитів
+RATE_LIMIT_WINDOW = 60  # За хвилину
+
+def rate_limit(f):
+    """Декоратор для rate limiting"""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Визначаємо клієнта за IP
+        client_ip = request.remote_addr
+        now = datetime.now()
+        
+        # Очищаємо старі записи
+        _rate_limit_store[client_ip] = [
+            timestamp for timestamp in _rate_limit_store[client_ip]
+            if now - timestamp < timedelta(seconds=RATE_LIMIT_WINDOW)
+        ]
+        
+        # Перевіряємо ліміт
+        if len(_rate_limit_store[client_ip]) >= RATE_LIMIT_REQUESTS:
+            return jsonify({'error': 'Too many requests'}), 429
+        
+        _rate_limit_store[client_ip].append(now)
+        return f(*args, **kwargs)
+    return decorated_function
+
+def cache_response(ttl=CACHE_TTL):
+    """Декоратор для кешування відповідей"""
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Генеруємо ключ кешу
+            cache_key = f.__name__ + str(args) + str(kwargs)
+            now = datetime.now()
+            
+            # Перевіряємо кеш
+            if cache_key in _cache:
+                if now - _cache_timestamps.get(cache_key, now) < timedelta(seconds=ttl):
+                    return _cache[cache_key]
+            
+            # Виконуємо функцію та кешуємо результат
+            result = f(*args, **kwargs)
+            _cache[cache_key] = result
+            _cache_timestamps[cache_key] = now
+            return result
+        return decorated_function
+    return decorator
+
+def generate_csrf_token():
+    """Генерація CSRF токену"""
+    if 'csrf_token' not in session:
+        session['csrf_token'] = secrets.token_hex(32)
+    return session['csrf_token']
+
+def validate_csrf_token():
+    """Валідація CSRF токену"""
+    token = session.get('csrf_token')
+    if not token:
+        return False
+    request_token = request.form.get('csrf_token') or request.headers.get('X-CSRF-Token')
+    return token == request_token
+
+# Робимо CSRF токен доступним у всіх шаблонах
+app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
 # Configuration from environment
-app.secret_key = os.environ.get('FLASK_SECRET', 'dev-change-me-to-secure-key')
-app.config['ENV'] = os.environ.get('FLASK_ENV', app.config.get('ENV', 'production'))
+app.secret_key = os.environ.get('FLASK_SECRET', secrets.token_hex(32))
+app.config['ENV'] = os.environ.get('FLASK_ENV', 'production')
+
+# Production security settings
+is_production = app.config['ENV'] == 'production'
+app.config['DEBUG'] = False if is_production else os.environ.get('FLASK_DEBUG', '0') == '1'
+
 from datetime import timedelta
 app.permanent_session_lifetime = timedelta(days=30)
-# Session cookie settings to help persistence across reloads
+
+# Session cookie settings - secure in production
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-app.config['SESSION_COOKIE_SECURE'] = False
+app.config['SESSION_COOKIE_SECURE'] = is_production  # HTTPS only in production
+
+# Additional security headers
+@app.after_request
+def set_security_headers(response):
+    if is_production:
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    return response
+
+
+# Temporary global exception handler to surface tracebacks for debugging
+@app.errorhandler(Exception)
+def _debug_all_exceptions(err):
+    # Print traceback to console so user running the server can see it
+    tb = traceback.format_exc()
+    try:
+        print('\n==== UNHANDLED EXCEPTION =====')
+        print(tb, file=sys.stderr)
+        print('==== END TRACEBACK =====\n', file=sys.stderr)
+    except Exception:
+        pass
+    # Return traceback in response when debugging to help local dev (avoid in production)
+    if app.config.get('DEBUG'):
+        return ("Internal Server Error\n\n" + tb), 500
+    return ("Internal Server Error"), 500
+
 # Ensure DB connection is closed after each request
 app.teardown_appcontext(close_db)
 
@@ -417,23 +537,38 @@ def api_demo():
 @app.route('/signUp/login', methods=['POST'])
 def sign_up_login():
     # create or fetch account, then set session and redirect to account page
-    first_name = request.form.get('first_name', '').strip()
-    last_name = request.form.get('last_name', '').strip()
-    email = request.form.get('email', '').strip()
-    phone = request.form.get('phone', '').strip()
-    # password is not used for now, just accept registration
-    password = request.form.get('password', '').strip()
-
-    existing = get_account_by_email(email)
-    if existing:
-        account_id = existing['id']
-    else:
-        account_id = add_account(first_name, last_name, phone, email)
-    session['user_id'] = account_id
-    # Keep user logged in across browser sessions
-    session.permanent = True
-    flash('Ласкаво просимо!', 'success')
-    return redirect(url_for('account'))
+    try:
+        email = request.form.get('email', '').strip()
+        if not email:
+            flash('Введіть email', 'error')
+            return redirect(url_for('signUp'))
+        existing = get_account_by_email(email)
+        if existing:
+            account_id = existing['id']
+        else:
+            # Якщо акаунта немає — створюємо з мінімальними даними
+            first_name = request.form.get('first_name', '').strip()
+            if not first_name:
+                first_name = 'Користувач'
+            last_name = request.form.get('last_name', '').strip()
+            if not last_name:
+                last_name = 'Користувач'
+            phone = '+00000000000'  # дефолтний телефон
+            account_id = add_account(first_name, last_name, phone, email)
+        session['user_id'] = account_id
+        session.permanent = True
+        flash('Ласкаво просимо!', 'success')
+        return redirect(url_for('account'))
+    except ValueError as e:
+        tb = traceback.format_exc()
+        print('\n--- sign_up_login ValueError ---\n', tb)
+        flash(f'Помилка валідації: {str(e)}', 'error')
+        return redirect(url_for('signUp'))
+    except Exception as e:
+        tb = traceback.format_exc()
+        print('\n--- sign_up_login Exception ---\n', tb)
+        flash(f'Помилка входу: {str(e)}', 'error')
+        return redirect(url_for('signUp'))
 
 # --- Маршрути для додавання даних ---
 @app.route('/admin/add_dish', methods=['GET', 'POST'])
@@ -712,5 +847,12 @@ def admin_logout():
 if __name__ == '__main__':
     host = os.environ.get('FLASK_RUN_HOST', '0.0.0.0')
     port = int(os.environ.get('FLASK_RUN_PORT', 5000))
-    debug = os.environ.get('FLASK_DEBUG', '0') in ('1', 'true', 'True')
+    # В продакшені використовуйте gunicorn, а не вбудований сервер Flask
+    debug = False if is_production else os.environ.get('FLASK_DEBUG', '0') in ('1', 'true', 'True')
+    
+    if is_production:
+        print('WARNING: Using Flask development server in production mode is not recommended.')
+        print('Please use gunicorn or another WSGI server for production deployment.')
+    
     app.run(host=host, port=port, debug=debug)
+

@@ -246,7 +246,7 @@
                 }catch(e){ }
             }
 
-            // wire apply button for manual testing
+                // wire apply button for manual testing
             try{
                 const applyBtn = document.getElementById('applyDiscountBtn');
                 if(applyBtn) applyBtn.addEventListener('click', function(){
@@ -254,18 +254,43 @@
                 });
             }catch(e){}
 
-                {% if pre_dish %}
-                    try{
-                        const pd = {{ pre_dish|int }};
-                        const pq = {{ pre_qty|int if pre_qty else 1 }};
-                        if (pd) items.push({dish_id: pd, qty: pq});
-                    }catch(e){}
-                {% endif %}
+            }catch(e){}
+
+        });
+
+                // Додаємо попередньо вибрану страву, якщо є
+    </script>
+    <!-- Inject preselected dish data via data attributes to avoid JS parser errors in editors -->
+    <div id="preData" style="display:none"
+         data-pre-dish='{{ pre_dish|tojson }}'
+         data-pre-qty='{{ pre_qty|tojson }}'></div>
+    <script>
+    // Read preselected dish after DOM ready and push to items if available
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var preEl = document.getElementById('preData');
+            if (!preEl) return;
+            var rawDish = preEl.getAttribute('data-pre-dish');
+            var rawQty = preEl.getAttribute('data-pre-qty');
+            var pd = null, pq = null;
+            try { pd = JSON.parse(rawDish); } catch(e) { pd = null; }
+            try { pq = JSON.parse(rawQty); } catch(e) { pq = null; }
+            if (pd != null && typeof window.items !== 'undefined') {
+                var qty = (typeof pq === 'number' ? pq : (parseInt(pq) || 1));
+                window.items.push({dish_id: pd, qty: qty});
+                if (typeof window.renderItems === 'function') window.renderItems();
+            }
+        } catch(e) { }
+    });
+    </script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
                 renderItems();
-            }catch(err){
+            } catch(err) {
                 console.error('Order page script error:', err);
             }
         });
-    </script>
+        </script>
 </body>
 </html>

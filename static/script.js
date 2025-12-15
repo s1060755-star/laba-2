@@ -242,12 +242,24 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.garland-lights').forEach(el => el.remove());
   }
 
-  /* Promo wheel: shows once per session (localStorage flag), draws a canvas wheel and spins to pick a discount */
+  /* Promo wheel: shows once per day (based on date in localStorage) */
   function createPromoModal(forceShow){
     try{
-      // only auto-show if user hasn't spun before (persist across sessions)
-      if(!forceShow && window.localStorage && localStorage.getItem('promoSpun')) return; // already spun
-    }catch(e){ }
+      if(window.localStorage){
+        const lastSpunDate = localStorage.getItem('promoSpunDate');
+        const today = new Date().toDateString(); // format: "Mon Dec 15 2025"
+        
+        console.log('Wheel Check:', { lastSpunDate, today, forceShow, shouldShow: !(lastSpunDate === today) });
+        
+        // якщо вже крутили сьогодні - не показуємо (якщо не force)
+        if(!forceShow && lastSpunDate === today) {
+          console.log('Wheel already shown today, skipping');
+          return;
+        }
+      }
+    }catch(e){ 
+      console.error('Wheel localStorage check error:', e);
+    }
 
     const discounts = [5,10,15,20,25,50];
     const colors = ['#f9c2c2','#ffd9a8','#d8f7d6','#d0e9ff','#e6d1ff','#ffd7e6'];
@@ -347,14 +359,14 @@ document.addEventListener("DOMContentLoaded", () => {
           const discount = discounts[landedIdx];
           resEl.textContent = `Вам випала знижка ${discount}% — вона застосована до вашого замовлення`;
           try{ localStorage.setItem('activeDiscount', String(discount)); }catch(e){}
-          try{ localStorage.setItem('promoSpun', '1'); }catch(e){}
+          try{ localStorage.setItem('promoSpunDate', new Date().toDateString()); }catch(e){}
           showPromoBadge(discount);
         }catch(e){
           // fallback to previously chosen index on error
           const discount = discounts[idx];
           resEl.textContent = `Вам випала знижка ${discount}% — вона застосована до вашого замовлення`;
           try{ localStorage.setItem('activeDiscount', String(discount)); }catch(e){}
-          try{ localStorage.setItem('promoSpun', '1'); }catch(e){}
+          try{ localStorage.setItem('promoSpunDate', new Date().toDateString()); }catch(e){}
           showPromoBadge(discount);
         }
         spinning = false; spinBtn.disabled = true;
@@ -405,11 +417,15 @@ document.addEventListener("DOMContentLoaded", () => {
   try{
     const path = location.pathname || '/';
     const force = (location.search && location.search.indexOf('promo=1') !== -1) || (location.hash === '#promo');
-    const spun = localStorage.getItem('promoSpun');
+    const lastSpunDate = localStorage.getItem('promoSpunDate');
+    const today = new Date().toDateString();
     const isHome = (path === '/' || path === '/index.html');
-    if(force || isHome){
-      // force=true ensures modal is shown on homepage reloads
-      setTimeout(() => createPromoModal(true), 900);
+    
+    // Show only if:
+    // 1. User explicitly requested via ?promo=1 or #promo, OR
+    // 2. It's homepage AND (no date saved OR date is from a different day)
+    if(force || (isHome && (!lastSpunDate || lastSpunDate !== today))){
+      setTimeout(() => createPromoModal(false), 900);
     }
   }catch(e){ /* do not auto-show modal on error */ }
 

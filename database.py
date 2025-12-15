@@ -24,9 +24,53 @@ except Exception:
             return False
 import json
 import datetime
+import re
+
+# --- Валідація даних ---
+def validate_email(email):
+    """Валідація email адреси"""
+    if not email or not isinstance(email, str):
+        return False
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
+
+def validate_phone(phone):
+    """Валідація телефонного номера"""
+    if not phone or not isinstance(phone, str):
+        return False
+    # Видаляємо всі символи крім цифр та +
+    cleaned = re.sub(r'[^\d+]', '', phone)
+    # Перевірка довжини (мінімум 10 цифр)
+    return len(re.sub(r'[^\d]', '', cleaned)) >= 10
+
+def sanitize_string(value, max_length=500):
+    """Очищення та обмеження довжини рядка"""
+    if not value:
+        return ''
+    value = str(value).strip()
+    # Видалення потенційно небезпечних символів
+    value = re.sub(r'[<>]', '', value)
+    return value[:max_length]
+
+def validate_price(price):
+    """Валідація ціни"""
+    try:
+        price_float = float(price)
+        return 0 <= price_float <= 999999.99
+    except (ValueError, TypeError):
+        return False
+
+def validate_integer(value, min_val=0, max_val=999999):
+    """Валідація цілого числа"""
+    try:
+        int_val = int(value)
+        return min_val <= int_val <= max_val
+    except (ValueError, TypeError):
+        return False
+
 
 def get_db():
-    """Підключення до бази даних"""
+    """Підключення до бази даних з оптимізацією продуктивності"""
     if 'db' not in g:
         db_path = os.environ.get('DATABASE_PATH', 'my_database.db')
         # Ensure directory exists for file path
@@ -36,8 +80,21 @@ def get_db():
                 os.makedirs(db_dir, exist_ok=True)
         except Exception:
             pass
-        g.db = sqlite3.connect(db_path)
+        g.db = sqlite3.connect(
+            db_path,
+            timeout=20.0,  # Збільшений timeout для concurrent requests
+            check_same_thread=False
+        )
         g.db.row_factory = sqlite3.Row  # Для отримання результатів у вигляді словника
+        
+        # Оптимізації SQLite для продуктивності
+        cursor = g.db.cursor()
+        cursor.execute('PRAGMA journal_mode=WAL')  # Write-Ahead Logging для кращої concurrency
+        cursor.execute('PRAGMA synchronous=NORMAL')  # Баланс між швидкістю та безпекою
+        cursor.execute('PRAGMA cache_size=10000')  # Збільшений кеш (10MB)
+        cursor.execute('PRAGMA temp_store=MEMORY')  # Тимчасові таблиці в пам'яті
+        cursor.execute('PRAGMA mmap_size=268435456')  # Memory-mapped I/O (256MB)
+        
     return g.db
 
 def close_db(e=None):
@@ -147,6 +204,10 @@ def init_db():
             calories INTEGER
         )
     ''')
+    # Створення індексів для оптимізації запитів
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_dish_price ON dish(price)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_dish_name ON dish(name)')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS work (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -167,6 +228,10 @@ def init_db():
             created_at TEXT
         )
     ''')
+    # Індекси для швидкого пошуку замовлень
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_orders_phone ON orders(phone)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at DESC)')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS feedback (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -186,6 +251,10 @@ def init_db():
             bio TEXT DEFAULT ''
         )
     ''')
+    # Індекс для швидкого пошуку по email (унікальність)
+    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_accounts_email ON accounts(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_accounts_phone ON accounts(phone)')
+    
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS favourites (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -193,6 +262,10 @@ def init_db():
             account_id INTEGER
         )
     ''')
+    # Індекси для favourites (оптимізація запитів по користувачам та стравам)
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_favourites_dish ON favourites(dish_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_favourites_account ON favourites(account_id)')
+    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_favourites_unique ON favourites(dish_id, account_id)')
     # If an older DB exists without account_id column, try to add it
     try:
         cursor.execute("ALTER TABLE favourites ADD COLUMN account_id INTEGER")
@@ -248,23 +321,64 @@ def init_db():
             password_hash TEXT
         )
     ''')
+    # Індекс для швидкого пошуку адміністраторів
+    cursor.execute('CREATE UNIQUE INDEX IF NOT EXISTS idx_admin_username ON admin_accounts(username)')
+    
+    db.commit()
+    try:
+        cursor.execute("UPDATE dish SET image = CASE \
+            WHEN image LIKE '/static/%' THEN substr(image, 9) \
+            WHEN image LIKE 'static/%' THEN substr(image, 8) \
+            ELSE image END")
+    except Exception:
+        pass
     db.commit()
 
 
 # --- Функції для додавання даних ---
-
-# --- Функції для додавання даних ---
 def add_dish(name, price, image, description, ingredients, calories):
+    """Додавання страви з валідацією"""
+    # Валідація
+    name = sanitize_string(name, 200)
+    if not name:
+        raise ValueError("Назва страви не може бути порожньою")
+    
+    if not validate_price(price):
+        raise ValueError("Некоректна ціна")
+    
+    image = sanitize_string(image, 500)
+    description = sanitize_string(description, 2000)
+    ingredients = sanitize_string(ingredients, 1000)
+    
+    if not validate_integer(calories, 0, 10000):
+        raise ValueError("Некоректна кількість калорій")
+    
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
         'INSERT INTO dish (name, price, image, description, ingredients, calories) VALUES (?, ?, ?, ?, ?, ?)',
-        (name, price, image, description, ingredients, calories)
+        (name, float(price), image, description, ingredients, int(calories))
     )
     db.commit()
     return cursor.lastrowid
 
 def add_work(name, phone, email, profecy):
+    """Додавання заяви на роботу з валідацією"""
+    name = sanitize_string(name, 200)
+    if not name:
+        raise ValueError("Ім'я не може бути порожнім")
+    
+    phone = sanitize_string(phone, 50)
+    # Phone is optional for account creation here — do not enforce strict validation
+    if not phone:
+        phone = ''
+    
+    email = sanitize_string(email, 200)
+    if not validate_email(email):
+        raise ValueError("Некоректна email адреса")
+    
+    profecy = sanitize_string(profecy, 500)
+    
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
@@ -275,6 +389,19 @@ def add_work(name, phone, email, profecy):
     return cursor.lastrowid
 
 def add_feedback(name, email, text):
+    """Додавання відгуку з валідацією"""
+    name = sanitize_string(name, 200)
+    if not name:
+        raise ValueError("Ім'я не може бути порожнім")
+    
+    email = sanitize_string(email, 200)
+    if not validate_email(email):
+        raise ValueError("Некоректна email адреса")
+    
+    text = sanitize_string(text, 5000)
+    if not text:
+        raise ValueError("Текст відгуку не може бути порожнім")
+    
     db = get_db()
     cursor = db.cursor()
     cursor.execute(
@@ -285,6 +412,26 @@ def add_feedback(name, email, text):
     return cursor.lastrowid
 
 def add_account(first_name, last_name, phone, email):
+    """Додавання акаунту з валідацією"""
+    first_name = sanitize_string(first_name, 100)
+    last_name = sanitize_string(last_name, 100)
+    
+    if not first_name or not last_name:
+        raise ValueError("Ім'я та прізвище не можуть бути порожніми")
+    
+    phone = sanitize_string(phone, 50)
+    # Debug: show phone value when validation fails
+    try:
+        print('DEBUG add_account phone:', repr(phone))
+    except Exception:
+        pass
+    if not validate_phone(phone):
+        raise ValueError("Некоректний телефонний номер")
+    
+    email = sanitize_string(email, 200)
+    if not validate_email(email):
+        raise ValueError("Некоректна email адреса")
+    
     db = get_db()
     cursor = db.cursor()
     try:
@@ -292,6 +439,8 @@ def add_account(first_name, last_name, phone, email):
             'INSERT INTO accounts (first_name, last_name, phone, email, avatar, bio) VALUES (?, ?, ?, ?, ?, ?)',
             (first_name, last_name, phone, email, '', '')
         )
+    except sqlite3.IntegrityError:
+        raise ValueError("Акаунт з таким email вже існує")
     except Exception:
         cursor.execute(
             'INSERT INTO accounts (first_name, last_name, phone, email) VALUES (?, ?, ?, ?)',
@@ -302,6 +451,24 @@ def add_account(first_name, last_name, phone, email):
 
 
 def update_account_profile(account_id, first_name, last_name, phone, email, avatar='', bio=''):
+    """Оновлення профілю акаунту з валідацією"""
+    first_name = sanitize_string(first_name, 100)
+    last_name = sanitize_string(last_name, 100)
+    
+    if not first_name or not last_name:
+        raise ValueError("Ім'я та прізвище не можуть бути порожніми")
+    
+    phone = sanitize_string(phone, 50)
+    if phone and not validate_phone(phone):
+        raise ValueError("Некоректний телефонний номер")
+    
+    email = sanitize_string(email, 200)
+    if not validate_email(email):
+        raise ValueError("Некоректна email адреса")
+    
+    avatar = sanitize_string(avatar, 500)
+    bio = sanitize_string(bio, 2000)
+    
     db = get_db()
     cursor = db.cursor()
     try:
